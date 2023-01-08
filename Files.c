@@ -13,7 +13,7 @@
     for(j;j<end;j++){
         dir_ful_name[j]=file_ful_name[j];
     }
-    //printf("[%s]",dir_ful_name);
+    printf("[%s]",dir_ful_name);
     DIR* di=opendir((dir_ful_name+6));
 
     if(!di){
@@ -97,13 +97,13 @@ int main(){
 
     FILE * a;
     char b[1000]="";
-    char file_name[1000]="mkdir C:\\\\Users\\\\Technokade\\\\Documents\\\\";
+    char file_name[1000]="mkdir C:\\\\Users\\\\Technokade\\\\Documents";
     char create[100]= "createfile --file";
     int end;
     //printf("%s\n",b);
     //printf("%s\n",create);
     make_command(b);
-    end=make_string(file_name,40);
+    end=make_string(file_name,38);
     //printf("%s",b);
     //printf("\n");
     if(strcmp(b,create) == 0){ //0 int the strcmp func means that tow string are equal
