@@ -13,7 +13,7 @@
     for(j;j<end;j++){
         dir_ful_name[j]=file_ful_name[j];
     }
-    printf("[%s]",dir_ful_name);
+  
     DIR* di=opendir((dir_ful_name+6));
 
     if(!di){
