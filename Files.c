@@ -13,11 +13,13 @@
     for(j;j<end;j++){
         dir_ful_name[j]=file_ful_name[j];
     }
-  
+    
+    printf("%s\n",dir_ful_name);
+    
     DIR* di=opendir((dir_ful_name+6));
 
     if(!di){
-
+       
         system(dir_ful_name);
 
     }
@@ -55,10 +57,28 @@
  int make_string(char a[],int k){
     int i=k,c=0;//c is the end of the path//filename
     char d;
+    int giume=0;
     while (1)
     {
         scanf("%c",&d);
-        if(d==' '|| d=='\n')
+        
+        if(giume==0&&d=='"'){//ignore the first giume
+            giume++;
+            continue;
+        }
+        if(d=='.'&&a[i-1]=='"'){//ignore the last giume in the file name
+            a[i-1]='.';
+            continue;
+        }
+       if(d=='/'&&a[i-1]=='"'){//ignore the last giume in the directory name
+            a[i-1]='\\';
+            a[i]='\\';
+            c=i-1;
+            i++;
+            giume=0;
+            continue;
+        }
+        if(((d==' '|| d=='\n')&&giume==0)||(giume!=0&&d=='\n'))
             break;
         if(d=='/'){
             d='\\';
@@ -108,6 +128,7 @@ int main(){
     //printf("\n");
     if(strcmp(b,create) == 0){ //0 int the strcmp func means that tow string are equal
 
+        printf("filename:%s\n",file_name);
         make_dir((file_name),end);
         make_file((file_name+6));
 
