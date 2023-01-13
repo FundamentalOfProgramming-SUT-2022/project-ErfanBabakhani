@@ -74,7 +74,7 @@ int make_file_dir_name(char a[],int k){
     return c;
  }
 
-int make_file_dir_name2(char a[],int k){
+int inserted_string(char a[],int k){
     
     int i=k,c=0;//c is the end of the path //filename
     char d,b;
@@ -82,7 +82,6 @@ int make_file_dir_name2(char a[],int k){
     while (1)
     {
         scanf("%c",&d);
-        printf("%c",d);
         
         if(giume==0&&d=='"'){//ignore the first giume
             giume++;
@@ -98,15 +97,8 @@ int make_file_dir_name2(char a[],int k){
             if(giume==0)
                 break;
         }
-        /*if(d=='n'&&(a[i-1]=='\\'&&a[i-2]!='\\')){
-            a[i-1]='\n';
-            continue;
-        }
-        else if (d=='n'&&(a[i-1]=='\\'&&a[i-2]=='\\'))
-        {
-            a[i-1]='n';
-            continue;
-        }*/
+
+
         if(d=='\\'){
             a[i]=d;//i
             i++;
@@ -175,39 +167,22 @@ int save_file_txt(char file_ful_name[]){// This is for backup the destination Fi
     int i=0;
     char d;
     while(!feof(fp)){
-        // printf("%d",i);
         d=fgetc(fp);
-        // if(d==EOF)
-            // c[i]='\0';
         c[i]=d;
-        //printf("%c\n",c[i]);
         i++;
     }
     c[i-1]='\0';
-    // printf("((%s))",c);
     fclose(fp);
     return i;
 
 }
 
-/*char* insert_strings(char file_ful_name[],int end){//This seperate a part file_ful_name[]
-    char end_part[100];
-    int i=end+1;
-    char c;
-    while(file_ful_name[i]!='\0'){
-        end_part[i]=file_ful_name[i];
-        i++;
 
-    }
-    
-    return end_part;
-
-}*/
 
 char* insert_txt(char file_ful_name[],int pos,int line,char end_part[]){//This is for appending two strings (Final of our work in insert command)
     char save[2000000]="";
-    printf("end_part=%s\n",end_part);
-    printf("c=%s]\n",c);
+    // printf("end_part=%s\n",end_part);
+    // printf("c=%s]\n",c);
     int q=0;
     int p=0;
     while(line!=1){
@@ -238,7 +213,7 @@ char* insert_txt(char file_ful_name[],int pos,int line,char end_part[]){//This i
         }
 
     }
-    printf("[%s]",save);
+    // printf("[%s]",save);
     FILE *fp=fopen(file_ful_name,"w");
     fprintf(fp,save);
     fclose(fp);
@@ -329,27 +304,22 @@ int main(){
     else if(strcmp(b,"insertstr --file")==0){
         char str[10];
         end=make_file_dir_name(file_name,38);// we make a file_name which contain("mkdir C:\\\\Users\\\\Technokade\\\\Documents(and user input string)") we write from 38 index 
-        printf("%s\n",file_name+6);
         insert_check(file_name+6);
 
         scanf("%s ",str);
-        // printf("%s\n",str);
         
-        // scanf("%s",str);//--str
-        // printf("%s\n",str);
+       
         if(strcmp(str,"--str")!=0){
             printf("invalid command");
             return 0;
         }
         
         char end_part[50]="";
-        make_file_dir_name2(end_part,0);
-        // printf("end_part=%s",end_part);
+        inserted_string(end_part,0);
         
         char str2[10]="";
 
         scanf(" %s ",str2);
-        // printf("\n%s\n",str2);
         if(strcmp(str2,"--pos")!=0){
             printf("invalid command");
             return 0;
@@ -380,11 +350,25 @@ int main(){
         
         line/=10;
         pos/=10;
-        printf("%d %d",line,pos);
 
         save_file_txt(file_name+6);
         int j=0;
         insert_txt((file_name+6),pos,line,end_part);
+        
+
+    }
+    else if(strcmp(b,"cat --file")==0){
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+        int i=0;
+        while (1)
+        {
+            if(c[i]=='\0')
+                break;
+            printf("%c",c[i]);
+            i++;
+        }
         
 
     }
@@ -393,6 +377,7 @@ int main(){
 
         printf("invalid command");
     }
+
 
 
 
