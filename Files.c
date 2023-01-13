@@ -77,7 +77,7 @@ int make_file_dir_name(char a[],int k){
 int make_file_dir_name2(char a[],int k){
     
     int i=k,c=0;//c is the end of the path //filename
-    char d;
+    char d,b;
     int giume=0;
     while (1)
     {
@@ -91,10 +91,53 @@ int make_file_dir_name2(char a[],int k){
         
         if (d==' ')
         {
-            if(a[i-1]=='"')
+            if(a[i-1]=='"'){
                 a[i-1]='\0';
-            break;
+                break;
+            }
+            if(giume==0)
+                break;
         }
+        /*if(d=='n'&&(a[i-1]=='\\'&&a[i-2]!='\\')){
+            a[i-1]='\n';
+            continue;
+        }
+        else if (d=='n'&&(a[i-1]=='\\'&&a[i-2]=='\\'))
+        {
+            a[i-1]='n';
+            continue;
+        }*/
+        if(d=='\\'){
+            a[i]=d;//i
+            i++;
+            scanf("%c",&d);//i
+            scanf("%c",&b);//i+1
+            if(b=='n'&&d=='\\'){// \\n
+                a[i]=b;
+                i++;
+                continue;
+            }
+            else if(d=='n'){// \n
+                a[i-1]='\n';
+                a[i]=b;
+                i++;
+                continue;
+            }
+            else if(d=='\\'){
+                a[i]=b;
+                i++;
+                continue;
+            }
+            else{
+                a[i]=d;
+                i++;
+                a[i]=b;
+                i++;
+                continue;
+            }
+
+        }
+        
 
         a[i]=d;
         i++;
@@ -141,7 +184,7 @@ int save_file_txt(char file_ful_name[]){// This is for backup the destination Fi
         i++;
     }
     c[i-1]='\0';
-    printf("((%s))",c);
+    // printf("((%s))",c);
     fclose(fp);
     return i;
 
@@ -214,7 +257,7 @@ void make_dir(char file_ful_name[],int end){
         dir_ful_name[j]=file_ful_name[j];
     }
     dir_ful_name[j]='\0';
-    printf("%s\n",dir_ful_name);
+    // printf("%s\n",dir_ful_name);
     
     DIR* di=opendir((dir_ful_name+6));
 
@@ -290,7 +333,7 @@ int main(){
         insert_check(file_name+6);
 
         scanf("%s ",str);
-        printf("%s\n",str);
+        // printf("%s\n",str);
         
         // scanf("%s",str);//--str
         // printf("%s\n",str);
@@ -301,12 +344,12 @@ int main(){
         
         char end_part[50]="";
         make_file_dir_name2(end_part,0);
-        printf("end_part=%s",end_part);
+        // printf("end_part=%s",end_part);
         
         char str2[10]="";
 
         scanf(" %s ",str2);
-        printf("\n%s\n",str2);
+        // printf("\n%s\n",str2);
         if(strcmp(str2,"--pos")!=0){
             printf("invalid command");
             return 0;
