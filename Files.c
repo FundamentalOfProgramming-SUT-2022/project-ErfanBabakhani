@@ -270,16 +270,65 @@ FILE* make_file(char file_ful_name[]){
  }
  //F create fuctions
 
-void string(char* str){
+//S remove function
+void remove_char(char file_ful_name[],char out[],int i,int size,int pos){//i=1 or 0: 1 is f(flag) and 0 is b(flag) 
+    int k=0;
     int j=0;
-    char d;
-    while (1)
-    {
-        
+    if(i==1){
+        while(c[k]!='\0')
+        {
+            if(k==pos){
+                while (size>0)
+                {
+                    k++;
+                    size--;
+                    continue;
+                }
+            }
+            out[j]=c[k];
+            k++;
+            j++;
+        }
     }
     
+    if(i==0){
+        while (c[k]!='\0')
+        {
+            if(k==(pos-size)){
+                while (size>0)
+                {
+                    k++;
+                    size--;
+                    continue;
+                }
+                       
+            }
+            out[j]=c[k];
+            k++;
+            j++;
+        }
+        
+    }
+    FILE *fp=fopen(file_ful_name,"w");
+    fprintf(fp,out);
+    fclose(fp);
+
 }
 
+int finde_line_pos(int pos,int line){
+    int k=0;
+    int i=0;
+    while(1){
+    if(c[i]=='\n')
+        line --;
+    if(!(line>1))
+        return k+1;
+    k++;
+    i++;    
+    }
+
+}
+//F remove function
 
 
 int main(){
@@ -371,6 +420,30 @@ int main(){
         }
         
 
+    }
+    else if(strcmp(b,"removestr --file")==0){
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+        char str[10]="";
+        char d;
+        int line;
+        int pos;
+        int size;
+        int i;
+        scanf("%s %d%c%d %s %d %c%c",str,&pos,&d,&line,str,&size,&d,&d);
+        printf("pos=%d line=%d char=%c",pos,line,d);
+        if(d=='b')
+            i=0;
+        else if(d=='f')
+            i=1;
+        char out[2000000]="";
+        if(line!=1)
+            pos+=finde_line_pos(pos,line);
+        remove_char((file_name+6),out,i,size,pos);
+        printf("((%s))",out);
+        
+        
     }
     
     else{
