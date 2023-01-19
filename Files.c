@@ -5,7 +5,8 @@
 #include <dirent.h>
 #include <errno.h>
 
-char c[2000000]="";
+char c[2000]="";
+char cp[2000]="";
 
 //command
 char* make_command(char a[1000]){ //this is the function of making string
@@ -180,7 +181,7 @@ int save_file_txt(char file_ful_name[]){// This is for backup the destination Fi
 
 
 char* insert_txt(char file_ful_name[],int pos,int line,char end_part[]){//This is for appending two strings (Final of our work in insert command)
-    char save[2000000]="";
+    char save[2000]="";
     // printf("end_part=%s\n",end_part);
     // printf("c=%s]\n",c);
     int q=0;
@@ -312,7 +313,7 @@ void remove_char(char file_ful_name[],char out[],int i,int size,int pos){//i=1 o
     FILE *fp=fopen(file_ful_name,"w");
     fprintf(fp,out);
     fclose(fp);
-
+    return;
 }
 
 int finde_line_pos(int pos,int line){
@@ -330,12 +331,103 @@ int finde_line_pos(int pos,int line){
 }
 //F remove function
 
+//S copy function
+void copy_dir(char file_ful_name[],char file_ful_name_copy[]){
+
+    int i=0;
+    while (1)
+    {
+        if (file_ful_name[i]=='\0')
+        {
+            return ;
+        }
+        
+        if(i==40){
+            file_ful_name_copy[40]='c';
+            file_ful_name_copy[41]='o';
+            file_ful_name_copy[42]='p';
+            file_ful_name_copy[43]='y';
+            i=44;
+            continue;
+        }
+        file_ful_name_copy[i]=file_ful_name[i];
+        i++;
+    }
+    
+
+}
+
+void copy_str(char file_ful_name[],char out[],int i,int size,int pos){//i=1 or 0: 1 is f(flag) and 0 is b(flag) 
+    
+    int k=0;
+    int j=0;
+    if(i==1){
+        while(c[k]!='\0')
+        {
+            if(k==pos){
+                while (size>0)
+                {
+                    out[j]=c[k];
+                    j++;
+                    k++;
+                    size--;
+                    continue;
+                }
+            }
+            k++;
+        }
+    }
+    
+    if(i==0){
+        while (c[k]!='\0')
+        {
+            if(k==(pos-size)){
+                while (size>0)
+                {
+                    out[j]=c[k];
+                    j++;
+                    k++;
+                    size--;
+                    continue;
+                }
+                       
+            }
+            k++;
+        }
+        
+    }
+    
+    FILE *fp=fopen(file_ful_name,"w");
+    fprintf(fp,out);
+    fclose(fp);
+    return;
+    }
+    
+    int save_file_txt_copy(char file_ful_name[]){// This is for backup the destination File contant
+    FILE *fp;
+    fp=fopen(file_ful_name,"r");
+    int i=0;
+    char d;
+    while(!feof(fp)){
+        d=fgetc(fp);
+        cp[i]=d;
+        i++;
+    }
+    cp[i-1]='\0';
+    fclose(fp);
+    return i;
+
+}
+//F copy & cut & paste function
+
 
 int main(){
 
     FILE * fp;
     char b[1000]="";
     char file_name[1000]="mkdir C:\\\\Users\\\\Technokade\\\\Documents";
+    char file_name_copy[1000]="";// 44
+    char file_name_undo[1000]="mkdir C:\\\\Users\\\\Technokade\\\\Documents\\\\undo";// 44 
     int end;
 
     make_command(b);
@@ -363,7 +455,7 @@ int main(){
             return 0;
         }
         
-        char end_part[50]="";
+        char end_part[1000]="";
         inserted_string(end_part,0);
         
         char str2[10]="";
@@ -432,18 +524,98 @@ int main(){
         int size;
         int i;
         scanf("%s %d%c%d %s %d %c%c",str,&pos,&d,&line,str,&size,&d,&d);
-        printf("pos=%d line=%d char=%c",pos,line,d);
         if(d=='b')
             i=0;
         else if(d=='f')
             i=1;
-        char out[2000000]="";
+        char out[2000]="";
         if(line!=1)
             pos+=finde_line_pos(pos,line);
         remove_char((file_name+6),out,i,size,pos);
-        printf("((%s))",out);
+
         
+    }
+    else if (strcmp(b,"copystr --file")==0)
+    {
         
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+        copy_dir(file_name,file_name_copy);
+        make_dir(file_name_copy,end);
+                
+        char str[10]="";
+        char d;
+        int line;
+        int pos;
+        int size;
+        int i;
+        scanf("%s %d%c%d %s %d %c%c",str,&pos,&d,&line,str,&size,&d,&d);
+        if(d=='b')
+            i=0;
+        else if(d=='f')
+            i=1;
+        char out[1000]="";
+        if(line!=1)
+            pos+=finde_line_pos(pos,line);
+        copy_str((file_name_copy+6),out,i,size,pos);
+    }
+    
+    else if(strcmp(b,"cutstr --file")==0){
+        
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+        copy_dir(file_name,file_name_copy);
+        make_dir(file_name_copy,end);
+        
+        char str[10]="";
+        char d;
+        int line;
+        int pos;
+        int size;
+        int i;
+        scanf("%s %d%c%d %s %d %c%c",str,&pos,&d,&line,str,&size,&d,&d);
+        if(d=='b')
+            i=0;
+        else if(d=='f')
+            i=1;
+        char out[2000]="";
+        char out2[2000]="";
+        if(line!=1)
+            pos+=finde_line_pos(pos,line);
+        
+        copy_str((file_name_copy+6),out,i,size,pos);
+        // FILE *fp=fopen(file_name+6,"w");
+        // fprintf(fp,"\0");
+        // fclose(fp);
+        remove_char(file_name+6,out2,i,size,pos);
+    }
+    
+    else if(strcmp(b,"pastestr --file")==0){
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+        copy_dir(file_name,file_name_copy);
+        make_dir(file_name_copy,end);
+
+        char str[10]="";
+        // char end_part[2000]="";
+        char d;
+        int line;
+        int pos;
+        scanf("%s %d%c%d",str,&pos,&d,&line);
+        save_file_txt_copy(file_name_copy+6);
+        insert_txt((file_name+6),pos,line,cp);
+
+    }
+    
+    else if(strcmp(b,"find --str")){
+        
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        save_file_txt(file_name+6);
+
     }
     
     else{
