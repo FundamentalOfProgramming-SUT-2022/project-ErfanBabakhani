@@ -138,7 +138,7 @@ int inserted_string(char a[],int k){
     }
 
     return c;
- }
+}
 //F making the file_name("mkdir C:\\\\Users\\\\Technokade\\\\Documents...")
 
 ////S insert funcions
@@ -420,6 +420,245 @@ void copy_str(char file_ful_name[],char out[],int i,int size,int pos){//i=1 or 0
 }
 //F copy & cut & paste function
 
+//S find functions
+int find_star1(char a[],int l,int *p_SL){
+int i=l,k=0;
+int index=0;
+int index_star=0;
+
+while (1){
+    // printf("s");
+    if(a[k+1]=='\\'&&a[k+2]=='*'){// ignore \\ for (\\*) searching
+        k+=2;
+        i++;
+        continue;
+    }
+    
+    if(c[i]=='\0'&&a[k]!='\0'){return -1;}// these are the end of the searching loop
+    if(a[k+1]=='\0'&&a[k]==c[i]){
+        *p_SL=i;
+        return index;
+    }    
+    
+    if(c[i]==a[k]){// we devide the loop in two case equal and not equal cases
+        
+        if(k==0){// if we find the first char we save it's index for returning in the end 
+            index=i;
+        }
+        
+        if(a[k+1]=='*'){// if the next char is (*) we start the ignoring mode while we find the nex part of (*) 
+            index_star=k+2;// set the index star to the first char of (*) it means we fined the string before (*) and we are searching the next part
+            k+=2;
+            i++;
+            while (1)
+            {
+                if(c[i]=='\0'&&a[k]!='\0')// these are the end of the finding func
+                    return -1;
+                if(a[k+1]=='\0'&&a[k]==c[i]){
+                    *p_SL=i;
+                    return index;
+                }
+
+                if(a[k+1]=='*'){// this is for having a more than one star wildcard mines is becuse we have to plus in the end loop
+                    i--;
+                    k--;
+                    break;
+                }
+
+                if(a[k]==c[i]&&a[k+1]==c[i+1]){// this means char of next string of (*) and searching string char are ok
+                    i++;
+                    k++;
+                    continue;
+                }
+
+                if(a[k]==c[i]&&a[k+1]=='\0')// end of find func
+                    return index;
+                
+                if(a[k+1]!=c[i+1]&&a[k]==c[i]){// we had a string like our searching string but they were'nt equal so continue from the first char of searching string 
+                    if(k==index_star)
+                        i++;
+                    k=index_star;
+                    continue;
+                }
+                
+                i++;
+            }
+            
+        }
+        i++;
+        k++;
+    }
+
+    if(c[i]!=a[k]){
+        if(index_star!=k){
+            k=index_star;
+            continue;
+        }
+        i++;
+    }
+}
+
+
+}
+
+int find_star2(char a[],int l,int *p_SL){//if we have a * at the first of the finding string like (*example) 
+int i=l,k=0;
+int index=0;
+int index_star=0;
+
+while (1){
+    
+    if(a[k+1]=='\\'&&a[k+2]=='*'){
+        k+=2;
+        i++;
+        continue;
+    }
+
+    if(c[i]=='\0'&&a[k]!='\0'){return -1;}
+    if(a[k+1]=='\0'&&a[k]==c[i]){
+        *p_SL=i;
+        return l;
+    }    
+    if(c[i]==a[k]){
+        
+        if(k==0){
+            index=i;
+        }
+        
+        if(a[k+1]=='*'){
+            index_star=k+2;
+            k+=2;
+            i++;
+
+            while (1)
+            {
+                if(c[i]=='\0'&&a[k]!='\0')
+                    return -1;
+                if(a[k+1]=='\0'&&a[k]==c[i]){
+                    *p_SL=i;
+                    return l;
+                }
+                if(a[k+1]=='*'){
+                    i--;
+                    k--;
+                    break;
+                }
+                if(a[k]==c[i]&&a[k+1]==c[i+1]){
+                    i++;
+                    k++;
+                    continue;
+                }
+                if(a[k]==c[i]&&a[k+1]=='\0')
+                    return l;
+                if(a[k+1]!=c[i+1]&&a[k]==c[i]){
+                    if(k==index_star)
+                        i++;
+                    k=index_star;
+                    continue;
+                }
+                
+                i++;
+            }
+            
+        }
+        i++;
+        k++;
+    }
+
+    if(c[i]!=a[k]){
+        if(index_star!=k){
+            k=index_star;
+            continue;
+        }
+        i++;
+    }
+}
+
+
+}
+
+
+int find_byword(int F){// F is the return of find_Star
+int i=0;
+int space=0;
+while (i<F)
+{
+    if(c[i]==' '&&c[i-1]!=' '&&c[i-1]!='\0')
+        space++;
+    i++;
+}
+return space;
+
+}
+
+
+int find_count(char *a,int *p_SL){
+    int k=0;
+    int n=0;
+    *p_SL=0;
+    while (1)
+    {
+        k=find_star1(a,*p_SL,p_SL);
+        if(k==-1)
+            return n;
+        else{
+            n++;
+        }
+    }
+    
+}
+
+int find_at(char *a,int N,int *p_SL){
+    
+    int k=0;
+    int n=1;
+    *p_SL=0;
+    while (1)
+    {
+        k=find_star1(a,*p_SL,p_SL);
+        if(k==-1)
+            return -1;
+        else{
+            if(n==N)
+                return k;
+            n++;
+        }
+    }
+}
+
+void find_at_byword(char a[],int N,int *p_SL){
+    int F=find_at(a,N,p_SL);
+    printf("%d",find_byword(F));
+    return;
+}
+
+void find_all_byword(char a[],int *p_SL){
+    int k=0;
+    *p_SL=0;
+    while (1)
+    {
+        k=find_star1(a,*p_SL,p_SL);
+        if(k==-1)
+            break;
+        printf("%d,",find_byword(k));
+    }
+    return;
+    
+}
+void find_all(char a[],int *p_SL){
+    int k=0;
+    *p_SL=0;
+    while (1)
+    {
+        k=find_star1(a,*p_SL,p_SL);
+        if(k==-1)
+            break;
+        printf("%d,",k);
+    }
+    return;
+    
+}
+//F find functions 
 
 int main(){
 
@@ -610,11 +849,138 @@ int main(){
 
     }
     
-    else if(strcmp(b,"find --str")){
+    else if(strcmp(b,"find --str")==0){
         
+        char str[10]="";
+        char str1[10]="";
+        char str2[10]="";
+        char str3[10]="";
+        char str4[10]="";
+        char d;
+        char end_part[1000]="";
+        
+        int at=0; 
+        int SL=-1;
+        
+        // scanf(" %s");
+        inserted_string(end_part,0);
+        scanf(" %s ",str);
         end=make_file_dir_name(file_name,38);
         insert_check(file_name+6);
         save_file_txt(file_name+6);
+        scanf("%c",&d);
+        
+        if(d=='-'){
+            // printf("Hrllo");
+            str1[0]=d;
+            int j=1;
+            while (1)
+            {
+                scanf("%c",&d);
+                if(d=='\n'||d==' '){
+                    
+                    if(strcmp(str1,"--at")==0)
+                        scanf("%d ",&at);
+                    break;
+                }
+                str1[j]=d;
+                j++;
+                printf("%c",str1[j]);
+                // if(d==' ')
+                    // printf("dfn\n");
+                        
+            }
+            if(d==' '){
+                j=0;
+                while (1)
+                {
+                    scanf("%c",&d);
+                    if(d=='\n'||d==' '){
+                        
+                        if(strcmp(str2,"--at")==0)
+                            scanf("%d ",&at);
+                        break;
+                    }
+                    str2[j]=d;
+                    j++;   
+                }
+            
+            }
+            
+            if(d==' '){
+                j=0;
+                while (1)
+                {
+                    scanf("%c",&d);
+                    if(d=='\n'||d==' '){
+                        
+                        if(strcmp(str3,"--at")==0)
+                            scanf("%d ",&at);
+                        break;
+                    }
+                    str3[j]=d;
+                    j++;   
+                }
+            
+            }
+            
+            if(d==' '){
+                j=0;
+                while (1)
+                {
+                    scanf("%c",&d);
+                    if(d=='\n'||d==' '){
+                        
+                        if(strcmp(str4,"--at")==0)
+                            scanf("%d ",&at);
+                        break;
+                    }
+                    str4[j]=d;
+                    j++;   
+                }
+            
+            }
+            
+        }
+        
+        if(str1[0]=='\0'&&str2[0]=='\0'&&str3[0]=='\0'&&str4[0]=='\0'){
+            // printf("...");
+            if(end_part[0]!='*')
+                printf("%d\n",find_star1(end_part,0,&SL));
+            else
+            printf("%d",find_star2(end_part,0,&SL));
+        }
+        
+        else if((strcmp(str1,"--buyword")==0&&strcmp(str2,"--at")==0&&str3[1]=='\0')||(strcmp(str1,"--at")==0&&strcmp(str2,"--buyword")==0&&str3[1]=='\0')){
+            // printf("[--%d--]\n",at);
+            find_at_byword(end_part,at,&SL);
+        }
+        else if((strcmp(str1,"--buyword")==0&&strcmp(str2,"--all")==0&&str3[1]=='\0')||(strcmp(str1,"--all")==0&&strcmp(str2,"--buyword")==0&&str3[1]=='\0')){
+            find_all_byword(end_part,&SL);
+        }
+        
+        else if(strcmp(str1,"--all")==0&&str2[1]=='\0'){
+            find_all(end_part,&SL);
+        }
+        else if(strcmp(str1,"--buyword")==0&&str2[1]=='\0'){
+            printf("%d",find_byword(0));
+        }
+        else if(strcmp(str1,"--count")==0&&str2[1]=='\0'){
+            printf("%d",find_count(end_part,&SL));
+        }
+        else if(strcmp(str1,"--at")==0&&str2[1]=='\0'){
+            printf("%d",find_at(end_part,at,&SL));
+        }
+        else{
+            printf("\nyou can only combine (at and buyword) or (all and buyword) other combenition are not logic \nand maybe you want two commands so please input them seperatly\nfor example (at and count) can't combine but you can input them seperatly");
+            printf("\n\n!!Please check your command and try again!!\n\n");
+        }
+
+        // printf("\n{%s}{%s}{%s}{%s}\n",str1,str2,str3,str4);
+        // printf("(%s)\n",end_part);
+        // printf("(%s)",c);
+        
+
 
     }
     
