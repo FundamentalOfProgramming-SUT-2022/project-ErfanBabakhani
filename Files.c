@@ -436,6 +436,8 @@ while (1){
     
     if(c[i]=='\0'&&a[k]!='\0'){return -1;}// these are the end of the searching loop
     if(a[k+1]=='\0'&&a[k]==c[i]){
+        if(k==0)
+            index=i;
         *p_SL=i;
         return index;
     }    
@@ -516,6 +518,8 @@ while (1){
 
     if(c[i]=='\0'&&a[k]!='\0'){return -1;}
     if(a[k+1]=='\0'&&a[k]==c[i]){
+        if(k==0)
+            index=i;
         *p_SL=i;
         return l;
     }    
@@ -595,10 +599,10 @@ return space;
 int find_count(char *a,int *p_SL){
     int k=0;
     int n=0;
-    *p_SL=0;
+    *p_SL=-1;
     while (1)
     {
-        k=find_star1(a,*p_SL,p_SL);
+        k=find_star1(a,*p_SL+1,p_SL);
         if(k==-1)
             return n;
         else{
@@ -609,13 +613,17 @@ int find_count(char *a,int *p_SL){
 }
 
 int find_at(char *a,int N,int *p_SL){
-    
+    int Num=find_count(a,p_SL);
+    if(N>Num||N<1){
+        printf("the number %d is not available\nWe have just %d item",N,Num);
+    exit(1);
+    }
     int k=0;
     int n=1;
-    *p_SL=0;
+    *p_SL=-1;
     while (1)
     {
-        k=find_star1(a,*p_SL,p_SL);
+        k=find_star1(a,*p_SL+1,p_SL);
         if(k==-1)
             return -1;
         else{
@@ -634,10 +642,10 @@ void find_at_byword(char a[],int N,int *p_SL){
 
 void find_all_byword(char a[],int *p_SL){
     int k=0;
-    *p_SL=0;
+    *p_SL=-1;
     while (1)
     {
-        k=find_star1(a,*p_SL,p_SL);
+        k=find_star1(a,*p_SL+1,p_SL);
         if(k==-1)
             break;
         printf("%d,",find_byword(k));
@@ -647,10 +655,10 @@ void find_all_byword(char a[],int *p_SL){
 }
 void find_all(char a[],int *p_SL){
     int k=0;
-    *p_SL=0;
+    *p_SL=-1;
     while (1)
     {
-        k=find_star1(a,*p_SL,p_SL);
+        k=find_star1(a,*p_SL+1,p_SL);
         if(k==-1)
             break;
         printf("%d,",k);
@@ -659,6 +667,84 @@ void find_all(char a[],int *p_SL){
     
 }
 //F find functions 
+
+//S replace functions
+void replace1(char first[],char seccond[],char file_name[],int *p_SL,char out[],int st){
+    save_file_txt(file_name);
+    st=find_star1(first,0,p_SL);
+    int size=(*p_SL)-st+1;
+
+    if(size<0){
+        printf("No result to finding\n");
+        exit(1);
+        return 0;
+    }
+
+    remove_char(file_name,out,1,size,st);
+    save_file_txt(file_name);
+    // printf("%s",c);
+    insert_txt(file_name,st,1,seccond);
+    
+}
+void replace2(char first[],char seccond[],char file_name[],int *p_SL,char out[],int st){
+    save_file_txt(file_name);
+    st=find_star2(first,0,p_SL);
+    int size=(*p_SL)-st+1;
+
+    if(size<0){
+        printf("No result to finding\n");
+        return 0;
+    }
+
+    remove_char(file_name,out,1,size,st);
+    save_file_txt(file_name);
+    // printf("%s",c);
+    insert_txt(file_name,st,1,seccond);
+    
+}
+void replace_at(char first[],char seccond[],char file_name[],int *p_SL,char out[],int st,int at){
+    save_file_txt(file_name);
+    // printf("%d\n",at);
+    st=find_at(first,at,p_SL);
+    int size=(*p_SL)-st+1;
+    // printf("st[%d] size[%d]",st,size);
+
+    if(size<0){
+        printf("No result to finding\n");
+        return 0;
+    }
+
+    remove_char(file_name,out,1,size,st);
+    save_file_txt(file_name);
+    // printf("%s",c);
+    insert_txt(file_name,st,1,seccond);
+    // insert_txt(,)
+}
+void replace_all(char first[],char seccond[],char file_name[],char out[],int st,int at,int *p_SL){
+    save_file_txt(file_name);
+    int k=0;
+    *p_SL=-1;
+    // printf("waesrtrhd");
+    // printf("\n%s\n",first);
+    int num;
+    num=find_count(first,p_SL);
+    // printf("[%d]",num);
+    if(num<1){
+        printf("No result to replacing");
+        exit(1);
+    }
+    
+    while (num>0)
+    {
+        // printf("%d ",num);
+        replace_at(first,seccond,file_name,p_SL,out,st,num);
+        num--;
+        // printf("%d,",k);
+    }
+    return;
+    
+}
+//F replace function
 
 int main(){
 
@@ -980,7 +1066,64 @@ int main(){
         // printf("(%s)\n",end_part);
         // printf("(%s)",c);
         
-
+    }
+    else if(strcmp(b,"replace --str1")==0){
+        char first[2000]="";
+        char seccond[2000]="";
+        char out[2000]="";
+        char str[10]="";
+        char str2[10]="";
+        char str3[10]="";
+        char str4[10]="";
+        int SL=-10;
+        int st;
+        int at;
+        char d;
+        inserted_string(first,0);
+        scanf("%s ",str);
+        inserted_string(seccond,0);
+        scanf("%s ",str2);
+        
+        end=make_file_dir_name(file_name,38);
+        insert_check(file_name+6);
+        
+        scanf("%c",&d);
+        if(d!='\n'){
+            str3[0]=d;
+            scanf("%s",str3+1);
+            scanf("%c",&d);
+            if(d==' '){
+                scanf("%d",&at);
+                scanf("%c",&d);
+                if(d!='\n')
+                    scanf("%s",str4);
+            }
+        }
+        // printf("%s,%s,%s,%s\n",first,seccond,str3,file_name+6);
+        if(str3[1]!='\0',str4[1]!='\0'){
+            printf("Wrong command and combinition check your command and try again");
+            return 0;
+        }
+        if(str3[1]=='\0'){
+            if(first[0]!='*')
+                replace1(first,seccond,file_name+6,&SL,out,st);
+            else
+                replace2(first,seccond,file_name+6,&SL,out,st);                
+        }
+        else if(strcmp(str3,"--at")==0){
+                // printf("----%d----\n",find_at(first,at,&SL));
+                replace_at(first,seccond,file_name+6,&SL,out,st,at);
+        }
+        else if(strcmp(str3,"--all")==0){
+            // printf("\\%s\\\n",first);
+            // printf("\\%s\\\n",c);
+            // int num=find_count(first,&SL);
+            // printf("((%d)))\n",num);
+            replace_all(first,seccond,file_name+6,out,st,at,&SL);
+        
+        }
+        // save_file_txt(file_name+6);
+        printf("Sccess full command");
 
     }
     
