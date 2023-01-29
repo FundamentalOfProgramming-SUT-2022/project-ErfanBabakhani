@@ -74,6 +74,45 @@ int make_file_dir_name(char a[],int k){
 
     return c;
  }
+ int make_file_dir_name_grep(char a[],int k,char *d){
+    int i=k,c=0;//c is the end of the path //filename
+    int giume=0;
+    while (1)
+    {
+        scanf("%c",&(*d));
+        
+        if(giume==0&&(*d)=='"'){//ignore the first giume
+            giume++;
+            continue;
+        }
+        if((*d)=='.'&&a[i-1]=='"'){//ignore the last giume in the file name
+            a[i-1]='.';
+            giume=0;
+            continue;
+        }
+       if((*d)=='/'&&a[i-1]=='"'){//ignore the last giume in the directory name
+            a[i-1]='\\';
+            a[i]='\\';
+            c=i-1;
+            i++;
+            giume=0;
+            continue;
+        }
+
+        if((((*d)==' '|| (*d)=='\n')&&giume==0)||(giume!=0&&(*d)=='\n'))
+            break;
+        if((*d)=='/'){
+            *d='\\';
+            c=i;
+            a[i]='\\';
+            i++;
+        }
+        a[i]=*d;
+        i++;
+    }
+
+    return c;
+ }
 
 int inserted_string(char a[],int k){
     
@@ -746,6 +785,644 @@ void replace_all(char first[],char seccond[],char file_name[],char out[],int st,
 }
 //F replace function
 
+//grep function
+void grep2(char file_name[],char a[],int *p_SL,int E){
+
+    int i=1;
+    int k=0;
+    char d;
+    while (1)
+    {
+        read_line(i,file_name);
+
+        if(c[0]=='\0')
+            break;
+        k=find_star1(a,0,p_SL);
+        if(k==-1){
+            i++;
+            continue;
+        }
+        printf("%s: %s",(file_name+E-4),c);
+        
+        c[0]='\0';
+        i++;
+    }
+    
+    return;
+}
+int grep2_c(char file_name[],char a[],int *p_SL,int E){
+
+    int i=1;
+    int k=0;
+    char d;
+    while (1)
+    {
+        read_line(i,file_name);
+
+        if(c[0]=='\0')
+            break;
+        k=find_star1(a,0,p_SL);
+        if(k==-1){
+            i++;
+            continue;
+        }
+        // printf("%s: %s",(file_name+E-4),c);
+        
+        c[0]='\0';
+        i++;
+    }
+    // printf("%s: %d",file_name+E-4,i-1);
+    
+    return i-1;
+}
+int grep2_I(char file_name[],char a[],int *p_SL,int E){
+
+    int i=1;
+    int k=0;
+    char d;
+    while (1)
+    {
+        read_line(i,file_name);
+
+        if(c[0]=='\0')
+            break;
+        k=find_star1(a,0,p_SL);
+        if(k==-1){
+            i++;
+            continue;
+        }
+        // printf("%s: %s",(file_name+E-4),c);
+        
+        c[0]='\0';
+        i++;
+    }
+    printf("%s\n",file_name+E-4);
+    
+    return i-1;
+}
+
+int read_line(int line,char file_name[]){
+    char S[1000]="";
+    if(line<1){
+        printf("invalid line");
+        return;
+    }
+    FILE *fp;
+    fp=fopen(file_name,"r");
+    
+    int i=0;
+    while (i<line-1)
+    {
+        fgets(S,1000,fp);
+        i++;
+    }
+
+    fgets(c,1000,fp);
+    fclose(fp);
+    return 0;
+}
+//F grep function
+
+//S undo
+void undo_dir(char file_ful_name[],char file_ful_name_undo[]){
+
+    int i=0;
+    while (1)
+    {
+        if (file_ful_name[i]=='\0')
+        {
+            return ;
+        }
+        
+        if(i==40){
+            file_ful_name_undo[40]='u';
+            file_ful_name_undo[41]='n';
+            file_ful_name_undo[42]='d';
+            file_ful_name_undo[43]='o';
+            i=44;
+            continue;
+        }
+        file_ful_name_undo[i]=file_ful_name[i];
+        i++;
+    }
+    
+
+}
+
+void make_undo(char file_name[],char file_name_undo[],int end){// file_name is complete(mkdir /root/...) and undo name will be made
+    // int end;
+    FILE *fp;
+    undo_dir(file_name,file_name_undo);
+    // printf("%s",file_name_undo);
+    make_dir(file_name_undo,end);
+    save_file_txt(file_name+6);
+    // printf("{%s}\n%s\n",file_name_undo+6,c);
+    fp=fopen(file_name_undo+6,"w");
+    fprintf(fp,"\0");
+    fprintf(fp,"%s",c);
+    fclose(fp);
+    // printf("[%s]",c);
+} 
+
+void undo(char file_name[],char file_name_undo[],int end){
+    FILE *fp;
+    undo_dir(file_name,file_name_undo);
+    // printf("%s",file_name_undo);
+    // make_dir(file_name_undo,end);
+    save_file_txt(file_name_undo+6);
+    // printf("{%s}\n%s\n",file_name_undo+6,c);
+    fp=fopen(file_name+6,"w");
+    fprintf(fp,"\0");
+    fprintf(fp,"%s",c);
+    fclose(fp);
+    // printf("[%s]",c);
+
+}
+//F undo
+
+//S close pairs
+void make_STD_text(char file_name[]){
+    save_file_txt(file_name);
+    char out[10000];
+    char out2[10000];
+    char out3[10000];
+    int st;
+    int at;
+    int SL=0;
+    int count;
+    int posb;
+    int posf;
+    char first[10]="\n";
+    char seccond[10]=" ";
+    char r[10]="{";
+    char l[10]="}";
+
+    count=find_count(first,&SL);
+
+    while(count>0){
+        save_file_txt(file_name);
+        replace_at(first,seccond,file_name,&SL,out,st,count);
+        count--;
+    }
+    save_file_txt(file_name);
+    SL=0;
+    int pos;
+    count=find_count(r,&SL);
+
+    while (count>0)
+    {
+        pos=find_at(r,count,&SL);
+        clean(file_name,pos);
+        count--;
+    }
+    save_file_txt(file_name);
+    SL=0;
+    count=find_count(l,&SL);
+    while (count>0)
+    {
+        pos=find_at(l,count,&SL);
+        clean(file_name,pos);
+        count--;
+    }
+    
+
+    return;
+}
+
+void clean(char file_name[],int pos){
+    int size=0;
+    int size2=0;
+    int j=1;
+  
+    save_file_txt(file_name);
+    while (1)
+    {
+        if(c[pos-j]==' '){
+            size++;
+            j++;
+        }
+        else
+            break;
+    }
+    
+    j=1;
+    while (1)
+    {
+        if(c[pos+j]==' ')
+            size2++;
+        else
+            break;
+        j++;
+    }
+
+    save_file_txt(file_name);
+    char out[1000]="";
+
+    remove_char(file_name,out,1,size2,pos+1);
+    save_file_txt(file_name);
+    
+    char out2[1000]="";
+    remove_char(file_name,out2,0,size,pos);
+    save_file_txt(file_name);
+} 
+
+void Close(char file_name[],int R_Save[],int L_Save[]){
+    int SL;
+    save_file_txt(file_name);
+
+    char R[10]="{";
+    char L[10]="}";
+    int N_R;
+    int N_L;
+    int N;
+    N_R=find_count(R,&SL);    
+    N_L=find_count(L,&SL);
+    N=N_R;
+
+    if(N>N_L)
+        N=N_L;
+    int i=1;
+    
+    while (i<=N)
+    {
+        R_Save[i-1]=find_at(R,i,&SL);
+        i++;
+    }
+    i=1;
+    while (i<=N)
+    {
+        L_Save[i-1]=find_at(L,i,&SL);
+        i++;
+    }
+
+    return;
+    
+}
+
+void insert_N_tab(char file_name[],int pos,int n){
+
+    int i=0;
+    char d;
+    int k;
+    char end_part[10]="    ";
+
+    while (i<n)
+    {
+        save_file_txt(file_name);
+
+        insert_txt(file_name,pos,1,end_part);
+        i++;
+    }
+    return;
+    
+}
+
+void S_and_L(char file_name[],int SL,int i,int *start,int *finish){
+    
+    *finish=SL-4*i-2;
+
+    int j=*finish;
+    save_file_txt(file_name);
+    while (c[j]!='\n')
+    {
+        j--;        
+    }
+    j+=((i+1)*4+1);
+    *start=j;
+    return;
+
+}
+
+int mearg(int R_save[],int L_save[],int R_L_save[],int N){
+    int i=0;
+    int j=0;
+    int k=0;
+
+    while (i<N&&j<N)
+    {
+        if(R_save[i]>L_save[j]){
+            R_L_save[k]=L_save[j];
+            j++;
+        }
+        else{
+            R_L_save[k]=R_save[i];
+            i++;
+        }
+        k++;
+    }
+    while (i<N)
+    {
+        R_L_save[k]=R_save[i];
+        i++;
+        k++;
+    }
+    while (j<N)
+    {
+        R_L_save[k]=L_save[j];
+        j++;
+        k++;
+    }
+
+    return k-1;
+    
+}
+
+void R_fix2(char file_name[],int *C_N,int rep){
+  
+    int *back_space=(int *)calloc(1000,sizeof(int));
+    int *back_N=(int *)calloc(1000,sizeof(int));
+
+    char space[10]=" ";
+    char new_line[10]="\n";
+
+    char out[1000]="";
+    int R_Save[1000];
+    int L_Save[1000];
+    int R_L_Save[1000];
+    int k;//the end index of R_L_save
+    
+    int N_R;
+    int N_L;
+    int N;
+    int SL;
+    char R[5]="{";
+    char L[5]="}";
+    save_file_txt(file_name);
+
+    N_R=find_count(R,&SL);    
+    N_L=find_count(L,&SL);
+    N=N_R;
+
+    if(N>N_L){
+        N=N_L;
+    }
+
+    Close(file_name,R_Save,L_Save);
+
+    k=mearg(R_Save,L_Save,R_L_Save,N);
+
+    int i=k;
+    int count=0;
+    save_file_txt(file_name);
+    
+    while (i>=0)
+    {
+        if(c[R_L_Save[i]]=='}'){
+            count++;
+        }
+        else if(c[R_L_Save[i]]=='{'){
+            count--;
+        }
+        if(count==0&&c[R_L_Save[i-1]]=='}'&&i>0){
+
+            back_N[*C_N]=R_L_Save[i-1];
+            back_space[*C_N]=R_L_Save[i];
+            (*C_N)+=1;
+        }
+        i--;
+    }
+
+        save_file_txt(file_name);// these are the last
+        insert_txt(file_name,R_L_Save[k],1,new_line);
+        save_file_txt(file_name);
+        insert_N_tab(file_name,R_L_Save[k],(rep)-1);
+
+    save_file_txt(file_name);
+    i=0;
+    while (i<*(C_N))
+    {
+
+        if(c[back_space[i]+1]!='}'&&c[back_space[i]+1]!='\n'){
+
+            save_file_txt(file_name);
+            insert_N_tab(file_name,back_space[i]+1,rep);
+
+            save_file_txt(file_name);
+            insert_txt(file_name,back_space[i]+1,1,new_line);
+        }
+        if(c[back_space[i]-1]!='}'&&c[back_space[i]-1]!='\0'&&c[back_space[i]+1]!='{'){
+            save_file_txt(file_name);
+            insert_txt(file_name,back_space[i],1,space);
+        }
+        save_file_txt(file_name);
+
+        insert_N_tab(file_name,back_N[i]+1,(rep)-1);
+        save_file_txt(file_name);
+        insert_txt(file_name,back_N[i]+1,1,new_line);
+        save_file_txt(file_name);
+
+        insert_txt(file_name,back_N[i],1,new_line);
+        save_file_txt(file_name);
+        insert_N_tab(file_name,back_N[i]+1,(rep)-1);
+        save_file_txt(file_name);
+
+
+        i++;
+    }
+            save_file_txt(file_name);
+            insert_N_tab(file_name,R_L_Save[0]+1,(rep));
+            save_file_txt(file_name);
+            insert_txt(file_name,R_L_Save[0]+1,1,new_line);
+        if(c[R_L_Save[0]-1]!='\0'&&c[R_L_Save[0]-2]!=' '){
+            save_file_txt(file_name);
+            insert_txt(file_name,R_L_Save[0],1,space);
+        }
+
+    free(back_N);
+    free(back_space);
+    return;
+
+}
+
+void Close_pair(char file_name[],int rep,int index,char R_Save[],char L_Save[]){
+
+    if(R_Save[0]==-1||L_Save[0]==-1){
+        return;
+    }
+
+    int C_N=0;
+
+        int *back_space=(int *)calloc(1000,sizeof(int));
+        int *back_N=(int *)calloc(1000,sizeof(int));
+        char space[10]=" ";
+        char new_line[10]="\n";
+
+        char out[1000]="";
+        int R_L_Save[1000];
+        int k;//the end index of R_L_save
+        
+
+        int N=index;
+        int SL;
+        char R[5]="{";
+        char L[5]="}";
+        save_file_txt(file_name);
+
+        k=mearg(R_Save,L_Save,R_L_Save,N);
+        int i=k;
+        int count=0;
+        save_file_txt(file_name);
+
+        while (i>=0)
+        {
+            if(c[R_L_Save[i]]=='}'){
+                count++;
+            }
+            else if(c[R_L_Save[i]]=='{'){
+                count--;
+            }
+            if(count==0&&c[R_L_Save[i-1]]=='}'&&i>0){
+                back_N[C_N]=R_L_Save[i-1];
+                back_space[C_N]=R_L_Save[i];
+                (C_N)+=1;
+            }
+            i--;
+        }
+
+        save_file_txt(file_name);// these are the last
+        save_file_txt(file_name);
+        insert_N_tab(file_name,R_L_Save[k],(rep)-1);
+        save_file_txt(file_name);
+        insert_txt(file_name,R_L_Save[k],1,new_line);
+        i=0;
+        while (i<(C_N))
+        {
+
+            if(c[back_space[i]+1]!='}'&&c[back_space[i]+1]!='\n'){
+                save_file_txt(file_name);
+                insert_N_tab(file_name,back_space[i]+1,rep);
+                save_file_txt(file_name);
+                insert_txt(file_name,back_space[i]+1,1,new_line);
+            }
+            if(c[back_space[i]-1]!='}'&&c[back_space[i]-1]!='\0'&&c[back_space[i]+1]!='{'){
+                save_file_txt(file_name);
+                insert_txt(file_name,back_space[i],1,space);
+            }
+            save_file_txt(file_name);
+            insert_N_tab(file_name,back_N[i]+1,(rep)-1);
+            save_file_txt(file_name);
+            insert_txt(file_name,back_N[i]+1,1,new_line);
+            save_file_txt(file_name);
+            insert_txt(file_name,back_N[i],1,new_line);
+            save_file_txt(file_name);
+            insert_N_tab(file_name,back_N[i]+1,(rep)-1);
+            save_file_txt(file_name);
+
+            i++;
+        }
+        save_file_txt(file_name);
+        insert_N_tab(file_name,R_L_Save[0]+1,(rep));
+        save_file_txt(file_name);
+        insert_txt(file_name,R_L_Save[0]+1,1,new_line);
+        if(c[R_L_Save[0]-1]!='\0'&&c[R_L_Save[0]-2]!=' '){
+                save_file_txt(file_name);
+                insert_txt(file_name,R_L_Save[0],1,space);
+        }
+
+        free(back_N);
+        free(back_space);
+    
+    return;
+}
+
+int find_pair(char file_name[],int i,int *start,int *finish){
+    char test1[20][100];
+    strcpy(test1[0],"{\n *\n}");// the contents of reep 1
+    strcpy(test1[1],"    *{\n    *\n    }");// the contents of reep 2
+    strcpy(test1[2],"        *{\n        *\n        }");// the cntesnts of reep 3
+    strcpy(test1[3],"            *{\n            *\n            }");// the contents of reep4
+    strcpy(test1[4],"                *{\n                *\n                }");// the contents of reep5
+    strcpy(test1[5],"                    *{\n                    *\n                    }");// the contents of reep6
+    strcpy(test1[6],"                        *{\n                        *\n                        }");// the contents of reep7 
+    strcpy(test1[7],"                            *{\n                            *\n                            }");// the contents of reep8 
+    strcpy(test1[8],"                                *{\n                                *\n                                }");// the contents of reep9 
+
+    char *a="{";
+    char *b="}";
+    int SL;
+    int SL2;
+    int SL3;
+    int first;
+    int count;
+    int *R_Save=(int *)calloc(1000,sizeof(int));
+    int *L_Save=(int *)calloc(1000,sizeof(int));
+    R_Save[0]=-1;
+    L_Save[0]=-1;
+    
+    save_file_txt(file_name);
+    count=find_count(test1[i],&SL2);
+    if(count==0){
+        exit(1);
+    }
+    int j=count;
+    SL2=-1;
+    while (j>0)
+    {
+
+        save_file_txt(file_name);
+        find_at(test1[i],j,&SL);
+
+        S_and_L(file_name,SL,i,start,finish);
+        int r=*start;
+        int l=*start;
+        int index_r=0;
+        int index_l=0;
+        while (1)
+        {
+            r=find_star1(a,r,&SL2)+1;
+            if(SL2>*finish||r==0){
+                break;
+            }
+            if(SL2<=*finish){
+                R_Save[index_r]=SL2;
+                index_r++;
+            }
+            if(index_r==20)
+                break;
+
+        }
+        while (1)
+        {
+            l=find_star1(b,l,&SL3)+1;
+            if(SL3>*finish||l==0){
+                break;
+            }
+            if(SL3<=*finish){
+                L_Save[index_l]=SL3;
+                index_l++;
+            }
+            if(index_l==20)
+                break;   
+        }
+        
+        Close_pair(file_name,i+2,index_r,R_Save,L_Save);
+        
+        free(R_Save);
+        free(L_Save);
+        int *R_Save=(int *)calloc(1000,sizeof(int));
+        int *L_Save=(int *)calloc(1000,sizeof(int));
+        R_Save[0]=-1;
+        L_Save[0]=-1;
+        j--;
+    }
+    
+    return count;
+}
+
+void make_L_R_save(char file_name[]){
+    int i=0;
+    int start;
+    int finish;
+    while (1)
+    {
+
+        find_pair(file_name,i,&start,&finish);
+        i++;
+    }
+    
+}
+//F close pair
+
 int main(){
 
     FILE * fp;
@@ -817,6 +1494,7 @@ int main(){
         line/=10;
         pos/=10;
 
+        make_undo(file_name,file_name_undo,end);
         save_file_txt(file_name+6);
         int j=0;
         insert_txt((file_name+6),pos,line,end_part);
@@ -856,6 +1534,7 @@ int main(){
         char out[2000]="";
         if(line!=1)
             pos+=finde_line_pos(pos,line);
+        make_undo(file_name,file_name_undo,end);
         remove_char((file_name+6),out,i,size,pos);
 
         
@@ -914,6 +1593,7 @@ int main(){
         // FILE *fp=fopen(file_name+6,"w");
         // fprintf(fp,"\0");
         // fclose(fp);
+        make_undo(file_name,file_name_undo,end);
         remove_char(file_name+6,out2,i,size,pos);
     }
     
@@ -1105,13 +1785,17 @@ int main(){
             return 0;
         }
         if(str3[1]=='\0'){
-            if(first[0]!='*')
+            if(first[0]!='*'){
+                make_undo(file_name,file_name_undo,end);
                 replace1(first,seccond,file_name+6,&SL,out,st);
-            else
+            }
+            else{
+                make_undo(file_name,file_name_undo,end);
                 replace2(first,seccond,file_name+6,&SL,out,st);                
+            }
         }
         else if(strcmp(str3,"--at")==0){
-                // printf("----%d----\n",find_at(first,at,&SL));
+                make_undo(file_name,file_name_undo,end);
                 replace_at(first,seccond,file_name+6,&SL,out,st,at);
         }
         else if(strcmp(str3,"--all")==0){
@@ -1119,6 +1803,7 @@ int main(){
             // printf("\\%s\\\n",c);
             // int num=find_count(first,&SL);
             // printf("((%d)))\n",num);
+            make_undo(file_name,file_name_undo,end);
             replace_all(first,seccond,file_name+6,out,st,at,&SL);
         
         }
@@ -1126,6 +1811,101 @@ int main(){
         printf("Sccess full command");
 
     }
+    
+    else if(strcmp(b,"grep --str")==0){
+        char str[10]="";
+        char a[1000]="";
+        int end;
+        int save[100];
+        int SL;
+        char d;      
+        inserted_string(a,0);  
+        scanf(" %s ",str);
+
+
+    while (1)
+    {
+        end=make_file_dir_name_grep(file_name,38,&d);
+        grep2(file_name+6,a,&SL,end);
+        if(d=='\n')
+            break;
+    }
+
+    }
+    else if (strcmp(b,"grep -c")==0)
+    {
+        
+        char str[10]="";
+        char str1[10]="";
+        char a[1000]="";
+        int end;
+        int save[100];
+        int SL;
+        char d;      
+        scanf(" %s ",str1);
+        inserted_string(a,0);  
+        scanf("%s ",str);
+
+        int NUM=0;
+        while (1)
+        {
+            end=make_file_dir_name_grep(file_name,38,&d);
+            NUM+=grep2_c(file_name+6,a,&SL,end);
+            if(d=='\n')
+                break;
+        }
+        printf("%d",NUM);  
+    }
+    else if(strcmp(b,"grep -I")==0)
+    {
+        char str[10]="";
+        char str1[10]="";
+        char a[1000]="";
+        int end;
+        int save[100];
+        int SL;
+        char d;      
+        scanf(" %s ",str1);
+        inserted_string(a,0);  
+        scanf("%s ",str);   
+        while (1)
+        {
+            end=make_file_dir_name_grep(file_name,38,&d);
+            grep2_I(file_name+6,a,&SL,end);
+            if(d=='\n')
+                break;
+        }
+    }
+    else if(strcmp(b,"undo --file")==0){
+        end=make_file_dir_name(file_name,38);
+        // printf("[%s]",file_name);
+        insert_check(file_name+6);
+        undo(file_name,file_name_undo,end);
+
+    }
+    else if(strcmp(b,"auto -indent")==0){
+        char d;
+        int C_N=0;
+        int rep=1;
+        
+        int end=make_file_dir_name_grep(file_name,38,&d);
+        insert_check(file_name+6);
+        // printf("%s",file_name+6);
+        // int save_SL[100];
+        make_undo(file_name,file_name_undo,end);
+        
+        make_STD_text(file_name+6);
+        R_fix2(file_name+6,&C_N,rep);
+        make_L_R_save(file_name+6);
+
+    }
+    else if (strcmp(b,"compare --files")==0)
+    {
+        /* code */
+    }
+    
+    
+    
     
     else{
 
