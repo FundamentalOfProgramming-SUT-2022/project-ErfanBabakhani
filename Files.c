@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <errno.h>
+#include<dirent.h>
 
 char c[2000]="";
 char cp[2000]="";
@@ -1507,6 +1508,130 @@ void compare(char file_name[],char file_name2[]){
 }
 //F compare txt
 
+//S tree
+int isDirectoryEmpty(char *dirname) {
+  int n = 0;
+  struct dirent *d;
+  DIR *dir = opendir(dirname);
+  if (dir == NULL) //Not a directory or doesn't exist
+    return 1;
+  while ((d = readdir(dir)) != NULL) {
+    if(++n > 2)
+      break;
+  }
+  closedir(dir);
+  if (n <= 2) //Directory Empty
+    return 1;
+  else
+    return 0;
+}
+
+
+void make_file_dep_name(char file_name1[],char file_nam2[],char name[]){
+    strcpy(file_nam2,file_name1);
+    int pos=strlen(file_name1);
+     
+    file_nam2[pos]='\\';
+    pos++;
+    file_nam2[pos]='\\';
+    pos++;
+    int k=strlen(name);
+    int i=0;
+    while (i<k)
+    {
+        file_nam2[pos+i]=name[i];
+        i++;
+    }
+    file_nam2[pos+i]='\0';
+    
+    return;
+}
+
+void show_enrtry(char file_name[],int dep,int end_dep){
+    if(dep>end_dep){
+        
+        return;
+    }
+
+    DIR *d;
+    struct dirent *dir;
+    char NAME[300]="";
+    unsigned int type;
+    char file_name2[300];
+    d = opendir(file_name);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        
+        {
+            strcpy(NAME,dir->d_name);
+            type=dir->d_type;
+            if(strcmp(NAME,".")==0||strcmp(NAME,"..")==0){
+                continue;
+            }
+            if(type==0){
+
+                if(dep>1){
+                    char b[10]="|";
+
+                    show_dep_space(dep);
+                    printf("%s_______",b);
+
+                    printf("%s\n",NAME);
+                }
+                if(dep==1){
+                    printf("%s\n",NAME);
+                }
+                continue;
+            }
+            if(type==16){
+                if(dep>1){
+                    char b[10]="|";
+
+                    show_dep_space(dep);
+                    printf("%s_______",b);
+                    printf("%s\n",NAME);
+                }
+                if(dep==1){
+                    printf("\n%s\n",NAME);
+                }
+
+                make_file_dep_name(file_name,file_name2,NAME);
+
+                int check=isDirectoryEmpty(file_name2);
+                if(check==1){
+                    continue;
+                }
+                    
+                show_enrtry(file_name2,dep+1,end_dep);
+                strcpy(file_name2,"");
+            }
+            
+        }
+        closedir(d);
+    }
+    
+    return;
+}
+
+void show_dep_space(int dep){
+    
+    char a[20]="_______";
+    char b[20]="|";
+    char f[20]="        ";
+
+    int i=0;
+    while (i<dep-2)
+    {
+        printf("%s",f);
+        i++;
+    }
+
+    return;
+    
+}
+//F tree
+
 int main(){
 
     FILE * fp;
@@ -1992,9 +2117,18 @@ int main(){
         end2=make_file_dir_name_grep(file_name2,38,&d);
         compare(file_name+6,file_name2+6);
     }
-    
-    
-    
+    else if(strcmp(b,"tree --dep")==0){
+        int end_dep;
+        scanf("%d",&end_dep);
+        printf("%d",end_dep);
+        
+        char NAME[300]="";
+        int dep;
+        char file_name1[300]="C:\\\\Users\\\\Technokade\\\\Documents\\\\root";
+        show_enrtry(file_name1,1,end_dep);
+
+    }
+
     
     
     else{
