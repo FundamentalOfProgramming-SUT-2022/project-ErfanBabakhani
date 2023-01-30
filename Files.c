@@ -1423,6 +1423,90 @@ void make_L_R_save(char file_name[]){
 }
 //F close pair
 
+//S compare txt
+void compare(char file_name[],char file_name2[]){
+    
+    char save1[1000]="";
+    char save2[1000]="";
+    char a[10]="\n";
+    int SL=0;
+    int count1;
+    int count2;
+    int pos1;
+    int pos2;
+    save_file_txt(file_name);
+    count1=find_count(a,&SL);
+    SL=0;
+    save_file_txt(file_name2);
+    count2=find_count(a,&SL);
+    count1++;
+    count2++;
+    int N=count1;
+    if(N>count2)
+        N=count2;
+    // printf("count1=%d count2=%d\n",count1,count2);
+    int i=1;
+    strcpy(c,"");
+    while(i<=N){
+        SL=0;
+        read_line(i,file_name);
+        pos1=find_star1(a,0,&SL);
+        if(pos1!=-1)
+            c[pos1]='\0';
+        strcpy(save1,c);
+        strcpy(c,"");
+        read_line(i,file_name2);
+        SL=0;
+        pos2=find_star1(a,0,&SL);
+        if(pos2!=-1)
+            c[pos2]='\0';
+        // printf("{%d %d}",pos1,pos2);
+        strcpy(save2,c);
+        strcpy(c,"");
+        if(strcmp(save1,save2)!=0){
+            printf("============ #%d ============\n",i);
+            printf("%s\n",save1);
+            printf("%s\n",save2);
+        }
+        i++;
+    }    
+    strcpy(c,"");
+
+    if(i<=count1){
+        printf(">>>>>>>>>>>> #%d - #%d >>>>>>>>>>>>\n",i,count1);
+        while (i<=count1)
+        {
+            SL=0;
+            read_line(i,file_name);
+            pos1=find_star1(a,0,&SL);
+            if(pos1!=-1)
+                c[pos1]='\0';
+            strcpy(save1,c);
+            strcpy(c,"");
+            printf("%s\n",save1);
+            i++;
+        }
+    }
+    if(i<=count2){
+        printf(">>>>>>>>>>>> #%d - #%d >>>>>>>>>>>>\n",i,count2);
+        while (i<=count2)
+        {
+            SL=0;
+            read_line(i,file_name2);
+            pos2=find_star1(a,0,&SL);
+            if(pos2!=-1)
+                c[pos2]='\0';
+            strcpy(save2,c);
+            strcpy(c,"");
+            printf("%s\n",save2);
+            i++;
+        }
+    }
+
+    return;
+}
+//F compare txt
+
 int main(){
 
     FILE * fp;
@@ -1901,8 +1985,14 @@ int main(){
     }
     else if (strcmp(b,"compare --files")==0)
     {
-        /* code */
+        int end2;
+        char d;
+        char file_name2[1000]="mkdir C:\\\\Users\\\\Technokade\\\\Documents";
+        end=make_file_dir_name_grep(file_name,38,&d);
+        end2=make_file_dir_name_grep(file_name2,38,&d);
+        compare(file_name+6,file_name2+6);
     }
+    
     
     
     
