@@ -9,10 +9,54 @@ char c[10000]="";
 char cp[10000]="";
 
 
+char* insert_txt(char file_ful_name[],int pos,int line,char end_part[]){//This is for appending two strings (Final of our work in insert command)
+    char save[2000]="";
+    // printf("end_part=%s\n",end_part);
+    // printf("c=%s]\n",c);
+    int q=0;
+    int p=0;
+    while(line!=1){
+        save[q]=c[q];
+        if(c[q]=='\n')
+            line--;
+        q++;
+    }
+
+    int i=q,j=0,k=0;
+    while (c[i]!='\0'||end_part[j]!='\0')
+    {
+        if(k!=pos){
+            
+            save[k+q]=c[i];
+            i++;
+            k++;
+        }
+        else if(j==0){
+            
+            while (end_part[j]!='\0')
+            {
+                save[k+q]=end_part[j];
+                j++;    
+                k++;
+            }
+            
+        }
+
+    }
+    // printf("[%s]",save);
+    FILE *fp=fopen(file_ful_name,"w");
+    fprintf(fp,save);
+    fclose(fp);
+    
+    return save;
+}
+
 //S find
 int finde_line_pos(int pos,int line){
     int k=0;
     int i=0;
+    if(line==1)
+        return 0;
     while(1){
     if(c[i]=='\n')
         line --;
@@ -451,23 +495,26 @@ int hilight(int x_pos,int y_pos,int j,char file_ful_name[]){
     WINDOW *a=initscr();
 
     int m=0;
-    int q=y_pos+j;
+    int q=y_pos+j-1;
     while (1)
     {
-        q=q/10;
+        q=(q)/10;
         if(q==0)
             break;
         m++;
     }
-    
+    // save_file_txt(file_ful_name);
     
     int k=x_pos-(6+m);
     move(y_pos,x_pos);
+    k+=finde_line_pos(k,y_pos+j-1);
     attron(COLOR_PAIR(7));
-    strcpy(c,"");
-    read_line(y_pos+j-1,file_ful_name);
+    // strcpy(c,"");
+    // read_line(y_pos+j-1,file_ful_name);
     printw("%c",c[k]);
+    mvprintw(y_pos+j-1,40,"[%d] [%d]",y_pos+j-1,m);
     attroff(COLOR_PAIR(7));
+    
     move(y_pos,x_pos);
     endwin();
 
@@ -586,6 +633,271 @@ void CPY(int start,int finish){
     strcpy(c,a);
     return;
 }
+
+void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 is unchanged and 1 is chnged 
+    
+    char file_name_save[1000]="";
+    // char command[1000]="";
+    // int V_C;//vas command 1 means do it and 0 means ignore
+
+    strcpy(file_name_save,file_ful_name);
+    file_name_save[24]='r';
+    file_name_save[25]='o';
+    file_name_save[26]='o';
+    file_name_save[27]='t';
+    int vas=insert_check(file_name_save);
+    
+    clear();
+    make_tilda1();
+    
+    int max_x,max_y;    
+    WINDOW *b=initscr();
+    
+    getmaxyx(b,max_y,max_x);
+    // printf("%d %d\n",max_x,max_y);
+    
+    int i;
+    j;
+    int SL;
+    char A[10]="\n";
+    int line_num;
+    // move(2,0);
+    if(vas==1){
+        save_file_txt(file_ful_name);
+        line_num=find_count(A,&SL);
+        strcpy(c,"");
+
+        i=j+1;
+        while ((i)<=(line_num+j)&&(i)<=max_y-4+j)
+        {
+            move(i-j+1,0);
+            read_line(i,file_ful_name);
+            printw("    %d %s",i,c);
+            i++;
+        }
+    }
+
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_GREEN);
+    init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    init_pair(3,COLOR_BLACK,COLOR_CYAN);
+    init_pair(7,COLOR_BLACK,COLOR_RED);
+    init_pair(8,COLOR_WHITE,COLOR_BLACK);
+    init_pair(9,COLOR_WHITE,COLOR_BLUE);
+    // init_pair(9,COLOR_BLACK,COLOR_);
+    attron(COLOR_PAIR(1));
+    
+    int x,y;
+    x=0;y=2;
+    move(max_y-3,0);
+
+    if(vas==0||change==1){
+        printw("INSERT:%s    +",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    else{
+        printw("INSERT:%s    ",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    
+    noecho();
+    attron(COLOR_PAIR(3));
+    // mvprintw(max_y-1,0,"Commands Bar:");
+    attroff(COLOR_PAIR(3));
+
+    move(1,max_x/2);
+    y=y_pos;
+    x=x_pos;
+    attron(COLOR_PAIR(2));
+    printw("THIS IS OUR TEXT EDITOR ENJOY IT");
+    
+    attroff(COLOR_PAIR(2));
+    keypad(stdscr,1);
+    
+    move(y_pos,x_pos);
+    int f;
+    int a;    
+    while (1)
+    {
+        
+        noecho();
+        a=getch();
+        refresh();
+
+        if(a==27){
+
+            endwin();
+            exit(1);   
+        }
+        // else if(a==KEY_BACKSPACE){
+
+            // clear_back(x,y);
+            // getyx(b,y,x);
+
+        // }
+
+        else if(a==KEY_UP){
+            y--;
+            move(y,x);
+            getyx(b,y,x);
+        }
+
+        else if(a==KEY_DOWN){
+            
+            y++;
+            move(y,x);        
+            getyx(b,y,x);
+        }
+
+        else if(a==KEY_RIGHT){
+            x++;
+            move(y,x);
+            getyx(b,y,x);
+        }
+        else if(a==KEY_LEFT){
+            x--;
+            move(y,x);
+            getyx(b,y,x);
+        }
+        else if(a==KEY_F(1)){
+            getyx(b,y,x);
+            clear();
+            printw("We want go to VISIUL MODE");
+            // getch();
+            // endwin();
+            // getyx(b,y,x);
+            // pri
+            endwin();
+            VISUAL_mode(x,y,j,file_ful_name,0);
+        }
+        else if(a==KEY_F(2)){
+            NORMAL_mode(x,y,file_ful_name,change,j);
+        }
+        
+        else{
+            getyx(b,y,x);
+            char A[5]="";
+            A[0]=(char)a;
+            // strcpy(A,"!");
+            int m=0;
+            int q=y+j;
+            while (1)
+            {
+                q=q/10;
+                if(q==0)
+                    break;
+                m++;
+            }
+            int k=x-(6+m);
+            
+            save_file_txt(file_ful_name);
+            insert_txt(file_ful_name,k,y+j-1,A);
+            // clear();
+            // mvprintw(0,0,"%s",c);
+            // getch();
+            shape_insert(x,y,file_ful_name,1,j);
+            change=1;
+            x++;
+            move(y,x);
+            continue;
+        }   
+    }        
+    
+    noecho();
+    getch();
+    endwin();    
+    return;
+
+}
+
+void shape_insert(int x_pos,int y_pos,char file_ful_name[],int change,int j){
+    char file_name_save[1000]="";
+    // char command[1000]="";
+    // int V_C;//vas command 1 means do it and 0 means ignore
+
+    strcpy(file_name_save,file_ful_name);
+    file_name_save[24]='r';
+    file_name_save[25]='o';
+    file_name_save[26]='o';
+    file_name_save[27]='t';
+    int vas=insert_check(file_name_save);
+    
+    clear();
+    make_tilda1();
+    
+    int max_x,max_y;    
+    WINDOW *b=initscr();
+    
+    getmaxyx(b,max_y,max_x);
+    // printf("%d %d\n",max_x,max_y);
+    
+    int i;
+    j;
+    int SL;
+    char A[10]="\n";
+    int line_num;
+    // move(2,0);
+    if(vas==1){
+        save_file_txt(file_ful_name);
+        line_num=find_count(A,&SL);
+        strcpy(c,"");
+
+        i=j+1;
+        while ((i)<=(line_num+j)&&(i)<=max_y-4+j)
+        {
+            move(i-j+1,0);
+            read_line(i,file_ful_name);
+            printw("    %d %s",i,c);
+            i++;
+        }
+    }
+
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_GREEN);
+    init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    init_pair(3,COLOR_BLACK,COLOR_CYAN);
+    init_pair(7,COLOR_BLACK,COLOR_RED);
+    init_pair(8,COLOR_WHITE,COLOR_BLACK);
+    init_pair(9,COLOR_WHITE,COLOR_BLUE);
+    // init_pair(9,COLOR_BLACK,COLOR_);
+    attron(COLOR_PAIR(1));
+    
+    int x,y;
+    x=0;y=2;
+    move(max_y-3,0);
+
+    if(vas==0||change==1){
+        printw("INSERT:%s    +",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    else{
+        printw("INSERT:%s    ",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    
+    noecho();
+    attron(COLOR_PAIR(3));
+    // mvprintw(max_y-1,0,"Commands Bar:");
+    attroff(COLOR_PAIR(3));
+
+    move(1,max_x/2);
+    y=y_pos;
+    x=x_pos;
+    attron(COLOR_PAIR(2));
+    printw("THIS IS OUR TEXT EDITOR ENJOY IT");
+    
+    attroff(COLOR_PAIR(2));
+    keypad(stdscr,1);
+    
+    move(y_pos,x_pos);
+    return;    
+}
+
+
 void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 is unsaved and 1 is saved 
     char file_name_save[1000]="";
     strcpy(file_name_save,file_ful_name);
@@ -593,7 +905,19 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
     file_name_save[25]='o';
     file_name_save[26]='o';
     file_name_save[27]='t';
+    int j2=j;
+    // char txt_save[1000]="";
+    
     int vas=insert_check(file_name_save);
+    
+    // strcpy(c,"");
+    // save_file_txt(file_name_save);
+    // strcpy(txt_save,c);
+    // FILE *fp_test=fopen(,"w");
+    // fprintf(fp_test,"%s",c);
+    // fclose(fp_test);
+
+    strcpy(c,"");
     clear();
     make_tilda1();
     int max_x,max_y;    
@@ -607,7 +931,7 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
     int line_num;
 
     if(vas==1){
-        save_file_txt(file_name_save);
+        save_file_txt(file_ful_name);
         line_num=find_count(A,&SL);
         strcpy(c,"");
         // read_line(1,file_ful_name);
@@ -632,6 +956,7 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
     init_pair(3,COLOR_BLACK,COLOR_CYAN);
     init_pair(7,COLOR_BLACK,COLOR_RED);
     init_pair(8,COLOR_WHITE,COLOR_BLACK);
+    init_pair(10,COLOR_WHITE,COLOR_BLACK);//unhilight
     // init_pair(9,COLOR_BLACK,COLOR_);
     attron(COLOR_PAIR(9));
     
@@ -670,10 +995,12 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
     move(y_pos,x_pos);
     
     // attron(COLOR_PAIR(7));
+    save_file_txt(file_ful_name);
     int k=hilight(x_pos,y_pos,j,file_ful_name);// k is a index of x_pos in c[] 
+    int k_save=k;
     int l=(int)strlen(c);
-    int k_s=k;
-    int k_f=k;
+    int k_s=k_save;
+    int k_f=k_save;
 
     int f;
     int a;
@@ -711,36 +1038,153 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
         }
         else if(a==KEY_RIGHT){
             
-            if(k==l||c[k]=='\n'){
-                // mvprintw(3,40,".....");
-                // move(y,x);
+            if(c[k]=='\n'){
+                j2++;
+                if(c[k+1]=='\0')
+                    continue;
+                y++;
+                if(y>=max_y-3){
+                    j2--;
+                    y--;
+                    continue;
+                }
+
+                k++;
+                if(k_f<k)
+                    k_f=k;
+                if(k_s<k_save){
+                    attron(COLOR_PAIR(10));
+                    mvaddch(y-1,x,c[k-1]);
+                    attroff(COLOR_PAIR(10));
+                    k_s++;
+                }
+
+                int m=0;
+                int q=y+j-1;
+                while (1)
+                {
+                    q=q/10;
+                    if(q==0)
+                        break;
+                    m++;
+                }
+
+                x=(6+m);
+
+                hilight(x,y,j,file_ful_name);
+                move(y,x);
+                // strcpy(c,"");
+                // read_line(y+j,file_ful_name);
+                // l+=(int)strlen(c);
+                // x++;
                 continue;
             }
-            else{
-            x++;
-            move(y,x);
-            // k_f++;
-            k++;
-            if(k_f<k){
-                k_f++;
+            else {
+                x++;
+
+                k++;
+                if(k_f<k)
+                    k_f=k;
+                if(k_s<k_save){
+                    attron(COLOR_PAIR(10));
+                    mvaddch(y,x-1,c[k-1]);
+                    attroff(COLOR_PAIR(10));
+                    k_s++;
+                }
+
+                move(y,x);
+                hilight(x,y,j,file_ful_name);
+                getyx(b,y,x);
             }
-            hilight(x,y,j,file_ful_name);
-            getyx(b,y,x);}
         }
         else if(a==KEY_LEFT){
-            if(k==0){
+            // if(k==0){
+            //     continue;
+            // }
+
+            // x--;
+            // k--;
+            // if(k_s>k){
+            //     k_s--;
+            // }
+
+
+            // hilight(x,y,j,file_ful_name);
+            // move(y,x);
+            // getyx(b,y,x);
+            if(c[k-1]=='\n'){
+                j2--;
+                // if(c[k-1]=='\0')
+                    // continue;
+                y--;
+                if(y<2){
+                    j2++;
+                    y++;
+                    continue;
+                }
+
+                k--;
+                if(k_s>k)
+                    k_s=k;
+                if(k_f>k_save){
+                    attron(COLOR_PAIR(10));
+                    mvaddch(y+1,x,c[k+1]);
+                    attroff(COLOR_PAIR(10));
+                    k_f--;
+                }
+
+                int m=0;
+                int q=y+j-1;
+                while (1)
+                {
+                    q=q/10;
+                    if(q==0)
+                        break;
+                    m++;
+                }
+
+                mvprintw(y,50,"[%d][%d][%d]",x,(int)strlen(c),m);
+                strcpy(c,"");
+                save_file_txt(file_ful_name);
+                
+                // hilight(x,y,j,file_ful_name);
+                
+                strcpy(c,"");
+                read_line(y+j-1,file_ful_name);
+                x=(6+m)+(int)strlen(c)-1;                
+                strcpy(c,"");
+                save_file_txt(file_ful_name);
+                // mvprintw(y,50,"{%d}",x);
+                
+                move(y,x);
+                // strcpy(c,"");
+                // read_line(y+j,file_ful_name);
+                // l+=(int)strlen(c);
+                // x++;
+                // k--;
                 continue;
             }
+            else {
+                x--;
+                k--;
+                if(k_s>k)
+                    k_s=k;
+                if(k_f>k_save){
+                    attron(COLOR_PAIR(10));
+                    mvaddch(y,x+1,c[k+1]);
+                    attroff(COLOR_PAIR(10));
+                    k_f--;
+                }
 
-            x--;
-            k--;
-            if(k_s>k){
-                k_s--;
+                move(y,x);
+                hilight(x,y,j,file_ful_name);
+                getyx(b,y,x);
             }
-            hilight(x,y,j,file_ful_name);
-            move(y,x);
-            getyx(b,y,x);
+
+
         }
+
+
         else if(a==KEY_F(0)){
             clear();
             printw("We want go to NORMAL MODE");
@@ -760,14 +1204,42 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
             // getch();
             strcpy(c,"");
             save_file_txt(file_ful_name);
-            remove_char(file_ful_name,out,1,k_f-k_s+1,k_s);
+            int size=k_f-k_s+1;
+            // k_s+=finde_line_pos(k_s,y_pos+j-1);
+            // mvprintw(0,0,"[%d]",k_s);
+            // noecho();
+            // getch();
+            remove_char(file_ful_name,out,1,size,k_s);
+            // save_file_txt(file_ful_name);
+            // clear();
+            // save_file_txt(file_ful_name);
+            // mvprintw(0,0,"[%s]",c);
+            // getch();
             strcpy(c,"");
             endwin();
-            NORMAL_mode(y,x,file_ful_name,1);
+            getyx(b,y,x);
+            NORMAL_mode(x_pos,y_pos,file_ful_name,1,j);
             // exit(1);
         }
         else if(a=='y'){
+            // copy_dir(file_ful_name,)
+            char copy[1000]="/home/erfan-b/Documents/copy";
+            char out[1000]="";
+            CPY(k_s,k_f);
+            strcpy(copy+28,file_ful_name+28);
+            FILE *fp=fopen(copy,"w");
+            fprintf(fp,"%s",c);
+            // clear();
+            // printw("[%s]",c);
+            fclose(fp);
+            // getch();
+            strcpy(c,"");
+            save_file_txt(file_ful_name);
 
+            strcpy(c,"");
+            endwin();
+            getyx(b,y,x);
+            NORMAL_mode(x_pos,y_pos,file_ful_name,1,j);
         }
         else{
             // addch(a);
@@ -784,9 +1256,12 @@ void VISUAL_mode(int x_pos,int y_pos,int j,char file_ful_name[],int change){//0 
 
 }
 
-void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unchanged and 1 is chnged 
+void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 is unchanged and 1 is chnged 
     
     char file_name_save[1000]="";
+    char command[1000]="";
+    int V_C;//vas command 1 means do it and 0 means ignore
+
     strcpy(file_name_save,file_ful_name);
     file_name_save[24]='r';
     file_name_save[25]='o';
@@ -804,21 +1279,21 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
     // printf("%d %d\n",max_x,max_y);
     
     int i;
-    int j=0;
+    j;
     int SL;
     char A[10]="\n";
     int line_num;
-
+    // move(2,0);
     if(vas==1){
-        save_file_txt(file_name_save);
+        save_file_txt(file_ful_name);
         line_num=find_count(A,&SL);
         strcpy(c,"");
 
         i=j+1;
-        while ((i+j)<=line_num&&(i+j)<=max_y-4)
+        while ((i)<=(line_num+j)&&(i)<=max_y-4+j)
         {
-            move(i+1,0);
-            read_line(i,file_name_save);
+            move(i-j+1,0);
+            read_line(i,file_ful_name);
             printw("    %d %s",i,c);
             i++;
         }
@@ -855,15 +1330,15 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
     attroff(COLOR_PAIR(3));
 
     move(1,max_x/2);
-    y=2;
-    x=0;
+    y=y_pos;
+    x=x_pos;
     attron(COLOR_PAIR(2));
     printw("THIS IS OUR TEXT EDITOR ENJOY IT");
     
     attroff(COLOR_PAIR(2));
     keypad(stdscr,1);
     
-    move(y,x);
+    move(y_pos,x_pos);
     int f;
     int a;    
     while (1)
@@ -878,12 +1353,22 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
             endwin();
             exit(1);   
         }
-        else if(a==KEY_BACKSPACE){
+        // else if(a==KEY_BACKSPACE){
 
-            clear_back(x,y);
-            getyx(b,y,x);
+            // clear_back(x,y);
+            // getyx(b,y,x);
+
+        // }
+        if(V_C==1){// command menu
+
+
+
+
+
+
 
         }
+
         else if(a==KEY_UP){
             noecho();
             if(y==2&&j>0&&vas==1){
@@ -896,13 +1381,13 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
                 
                 move(max_y-3,0);
                 attron(COLOR_PAIR(1));
-                if(vas==0){
+                if(vas==0||change==1){
                     printw("NORMAL:%s    +",file_ful_name+28);
                     attroff(COLOR_PAIR(1));
                     refresh();
                 }
                 else{
-                    printw("NORMAL:%s    ",file_name_save+28);
+                    printw("NORMAL:%s    ",file_ful_name+28);
                     attroff(COLOR_PAIR(1));
                     refresh();
                 }
@@ -920,11 +1405,13 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
                 while (i<=(line_num+j)&&(i)<max_y-4+j)
                 {
                     move(i+1-j,0);
-                    read_line(i,file_name_save);
+                    read_line(i,file_ful_name);
                     printw("    %d %s",i,c);
                     i++;
                 }
-                move(2,0);
+                // move(2,0);
+                // getyx(b,y,x);
+                move(y,x);
                 continue;
             }
             else{
@@ -946,13 +1433,13 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
                 
                 move(max_y-3,0);
                 attron(COLOR_PAIR(1));
-                if(vas==0){
+                if(vas==0||change==1){
                     printw("NORMAL:%s    +",file_ful_name+28);
                     attroff(COLOR_PAIR(1));
                     refresh();
                 }
                 else{
-                    printw("NORMAL:%s    ",file_name_save+28);
+                    printw("NORMAL:%s    ",file_ful_name+28);
                     attroff(COLOR_PAIR(1));
                     refresh();
                 }
@@ -971,19 +1458,21 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
                 while (i<=(line_num+j)&&(i)<max_y-4+j)
                 {
                     move(i+1-j,0);
-                    read_line(i,file_name_save);
+                    read_line(i,file_ful_name);
                     printw("    %d %s",i,c);
                     i++;
                 }
-                move(max_y-4,0);
+                // getyx(b,y,x);
+                move(y,x);
                 continue;
             }
-            else{
+            else if(y!=max_y-4){
                 y++;
                 move(y,x);
             }
             getyx(b,y,x);
         }
+
         else if(a==KEY_RIGHT){
             x++;
             move(y,x);
@@ -1005,10 +1494,108 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change){//0 is unc
             endwin();
             VISUAL_mode(x,y,j,file_ful_name,0);
         }
-        else{
-            addch(a);
-            getyx(b,y,x);
+        else if((char)a==':'){
+            
+            move(max_y-1,14);
+            // printw("");
+            // move(20,x);
             refresh();
+            int B;
+            int count=0;
+            
+            noecho();
+            B=getch();
+            if(B=='\n'||B==':'){
+                move(y,x);
+                continue;
+            }
+            addch(B);
+            command[0]=B;
+            V_C=1;
+            count++;
+            int x1,y1;
+            
+            while (1){
+                // printw(".");
+                noecho();
+                getyx(b,y1,x1);
+                B=getch();
+                
+                if(B==KEY_BACKSPACE){
+                    if(x1<15)
+                        continue;
+                    command[count-1]='\0';
+                    count--;
+                    clear_back(x1,y1);
+                    // getyx(b,y1,x1);
+                    continue;
+
+                }
+                
+                if(B=='\n'||B==':'){
+                    move(y,x);
+                    break;
+                }
+                getyx(b,y1,x1);
+                mvaddch(y1,x1,B);
+                x1++;
+                move(y1,x1);
+                command[count]=B;
+                count++;
+            }
+            
+            mvprintw(0,0,"{%s} [%d]",command,V_C);
+            
+        }
+        else if(a==KEY_F(3)){
+            INSERT_mode(x,y,file_ful_name,change,j);
+        }
+        else if((char)a=='p'){
+            
+            
+            getyx(b,y,x);
+            char file_name_copy[1000]="";
+            char S[1000]="";
+            strcpy(file_name_copy,file_ful_name);
+            file_name_copy[24]='c';
+            file_name_copy[25]='o';
+            file_name_copy[26]='p';
+            file_name_copy[27]='y';
+            strcpy(c,"");
+            save_file_txt(file_name_copy);
+            strcpy(S,c);
+                        // clear();
+            // printw("%s",S);
+            // getch();
+
+            
+            int m=0;
+            int q=y+j-1;
+            while (1)
+            {
+                q=q/10;
+                if(q==0)
+                    break;
+                m++;
+            }
+
+            move(y,x);
+            int k=x-(6+m);
+            k+=finde_line_pos(k,y+j-1);
+            save_file_txt(file_ful_name);
+            insert_txt(file_ful_name,k,1,S);
+            clear();
+            // save_file_txt(file_ful_name);
+            // printw("%s",c);
+            // getch();
+            NORMAL_mode(x,y,file_ful_name,1,j);
+            endwin();
+        }
+        else{
+            // addch(a);
+            // getyx(b,y,x);
+            // refresh();
+            continue;
         }    
     }
 
@@ -1051,9 +1638,11 @@ void START_mode(){
             // printw("$$$");
             // getch();
             char pre[100]="/home/erfan-b/Documents/test/"; //from 29 index is our file name 
+            char pre2[100]="/home/erfan-b/Documents/root/";
             // printw("{%s , %d}",file_name,(int)strlen(file_name));
             if((int)strlen(file_name)==0){
                 make_newfile_name(pre);
+                strcpy(pre2,pre);
                 pre[24]='t';
                 pre[25]='e';
                 pre[26]='s';
@@ -1061,24 +1650,29 @@ void START_mode(){
                 endwin();
                 FILE *fp=fopen(pre,"w");
                 fclose(fp);
-                NORMAL_mode(0,0,pre,0);
+                NORMAL_mode(0,2,pre,0,0);
             }
             else{
                 int i=29;
                 while (file_name[i-29]!='\0')
                 {
                     pre[i]=file_name[i-29];
+                    pre2[i]=file_name[i-29];
                     i++;
                 }
                 // printw("[%s]",pre);
                 // FILE *fp;
                 // fp=fopen(pre,"w");
                 // fclose(fp);
-                // int vas=insert_check(pre);
+                int vas=insert_check(pre);
                 FILE *fp=fopen(pre,"w");
+                if(vas==1){
+                    save_file_txt(pre2);
+                    fprintf(fp,"%s",c);
+                }
                 fclose(fp);
                 endwin();
-                NORMAL_mode(0,0,pre,0);
+                NORMAL_mode(0,2,pre,0,0);
                 return;
 
             }
