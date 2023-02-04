@@ -2121,7 +2121,13 @@ int main(){
         int end_dep;
         scanf("%d",&end_dep);
         printf("%d",end_dep);
-        
+        if(end_dep<1&&end_dep!=-1){
+            printf("UNVALID DEP");
+            exit(1);
+        }
+        if(end_dep==-1){
+            end_dep=20;
+        }
         char NAME[300]="";
         int dep;
         char file_name1[300]="C:\\\\Users\\\\Technokade\\\\Documents\\\\root";
