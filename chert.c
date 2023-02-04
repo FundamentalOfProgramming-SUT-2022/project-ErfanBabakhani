@@ -877,7 +877,7 @@ void CPY(int start,int finish){
     return;
 }
 
-void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 is unchanged and 1 is chnged 
+/*void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 is unchanged and 1 is chnged 
     
     char file_name_save[1000]="";
     // char command[1000]="";
@@ -1033,7 +1033,7 @@ void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 
             A[0]=(char)a;
             // strcpy(A,"!");
             int m=0;
-            int q=y+j;
+            int q=y+j-1;
             while (1)
             {
                 q=q/10;
@@ -1069,7 +1069,356 @@ void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 
     endwin();    
     return;
 
+}*/
+void INSERT_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 is unchanged and 1 is chnged 
+    
+    char file_name_save[1000]="";
+    // char command[1000]="";
+    // int V_C;//vas command 1 means do it and 0 means ignore
+
+    strcpy(file_name_save,file_ful_name);
+    file_name_save[24]='r';
+    file_name_save[25]='o';
+    file_name_save[26]='o';
+    file_name_save[27]='t';
+    int vas=insert_check(file_name_save);
+    vas=1;
+    clear();
+    make_tilda1();
+    
+    int max_x,max_y;    
+    WINDOW *b=initscr();
+    
+    getmaxyx(b,max_y,max_x);
+    // printf("%d %d\n",max_x,max_y);
+    // if(vas==0)
+    int i;
+    j;
+    int SL;
+    char A[10]="\n";
+    int line_num;
+    // move(2,0);
+    if(vas==1){
+        save_file_txt(file_ful_name);
+        line_num=find_count(A,&SL);
+        strcpy(c,"");
+
+        i=j+1;
+        while ((i)<=(line_num+j)&&(i)<=max_y-4+j)
+        {
+            move(i-j+1,0);
+            read_line(i,file_ful_name);
+            printw("    %d %s",i,c);
+            i++;
+        }
+    }
+    strcpy(c,"");
+    read_line(1,file_ful_name);
+    if(c[0]=='\0'){
+        // mvprintw(1,0,"\n");
+        mvprintw(2,0,"    1 ");
+    }
+
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_GREEN);
+    init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    init_pair(3,COLOR_BLACK,COLOR_CYAN);
+    init_pair(7,COLOR_BLACK,COLOR_RED);
+    init_pair(8,COLOR_WHITE,COLOR_BLACK);
+    init_pair(9,COLOR_WHITE,COLOR_BLUE);
+    // init_pair(9,COLOR_BLACK,COLOR_);
+    attron(COLOR_PAIR(1));
+    
+    int x,y;
+    x=0;y=2;
+    move(max_y-3,0);
+
+    if(vas==0||change==1){
+        printw("INSERT:%s    +",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    else{
+        printw("INSERT:%s    ",file_ful_name+28);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+    
+    noecho();
+    attron(COLOR_PAIR(3));
+    // mvprintw(max_y-1,0,"Commands Bar:");
+    attroff(COLOR_PAIR(3));
+
+    move(1,max_x/2);
+    y=y_pos;
+    x=x_pos;
+    attron(COLOR_PAIR(2));
+    printw("THIS IS OUR TEXT EDITOR ENJOY IT");
+    
+    attroff(COLOR_PAIR(2));
+    keypad(stdscr,1);
+    
+    move(y_pos,x_pos);
+    int f;
+    int a;    
+    while (1){
+        // mvprintw(max_y-1,0,"VVV");
+        refresh();
+        move(y,x);
+        noecho();
+        a=getch();
+        refresh();
+
+        if(a==27){
+
+            endwin();
+            exit(1);   
+        }
+        // else if(a==KEY_BACKSPACE){
+
+            // clear_back(x,y);
+            // getyx(b,y,x);
+
+        // }
+
+        else if(a==KEY_UP){            
+            
+            // y--;
+            // move(y,x);
+            // getyx(b,y,x);
+        
+                        getyx(b,y,x);
+                if(y+j-2>0){
+                    char A[1000];
+                    char B[1000];
+                    int lB;
+                    int lA;
+                    strcpy(c,"");
+                    read_line(y+j-1,file_ful_name);
+                    strcpy(A,c);
+                    strcpy(c,"");
+                    read_line(y+j-2,file_ful_name);
+                    strcpy(B,c);
+                    strcpy(c,"");
+                    lB=(int)strlen(B);
+                    lA=(int)strlen(A);
+                    
+                    int m;
+                    if(y+j-2<10)
+                        m=0;
+                    if(y+j-2>=10&&y+j-2<100)
+                        m=1;
+                    if(y+j-2>=100&&y+j-2<1000)
+                        m=2;
+                
+                    if(lB<lA&&x>lB+m+5){
+                        
+                                            // clear();
+                    // printw("%d %d",(int)strlen(B),(int)strlen(A));
+                    // getch();
+
+
+                        x=lB-1+6+m;
+                    }
+
+                }//333//
+
+                y--;
+                move(y,x);
+        
+        
+        }
+
+        else if(a==KEY_DOWN){
+            
+            // y++;
+            // move(y,x);        
+            // getyx(b,y,x);
+
+                    int m1;
+                    if(y+j<10)
+                        m1=0;
+                    if(y+j>=10&&y+j<100)
+                        m1=1;
+                    if(y+j>=100&&y+j<1000)
+                        m1=2;
+                    
+                    if(y+j>0){
+                    
+                        char A[1000];
+                        char B[1000];
+                        int lB;
+                        int lA;
+                        strcpy(c,"");
+                        read_line(y+j-1,file_ful_name);
+                        strcpy(A,c);
+                        strcpy(c,"");
+                        read_line(y+j,file_ful_name);
+                        strcpy(B,c);
+                        strcpy(c,"");
+                        lB=(int)strlen(B);
+                        lA=(int)strlen(A);
+                        // clear();
+                        // printw("lA=%d lB=%d x=%d",lA,lB,x);
+                        // getch();
+                                            int m;
+                            if(y+j<10)
+                                m=0;
+                            if(y+j>=10&&y+j<100)
+                                m=1;
+                            if(y+j>=100&&y+j<1000)
+                                m=2;
+                        if(lB<lA&&x>lB+m+5){
+                            
+                                                // clear();
+                        // printw("%d %d",(int)strlen(B),(int)strlen(A));
+                        // getch();
+    
+
+                            x=lB-1+6+m;
+                        }
+
+                    }//333//
+                
+                y++;
+                move(y,x);
+            
+        }
+
+        else if(a==KEY_RIGHT){
+            
+            getyx(b,y,x);
+            strcpy(c,"");
+            read_line(y+j-1,file_ful_name);
+            int x_check;
+            if(y+j-1<10)
+                x_check=x-6;
+            if(y+j-1>=10&&y+j-1<100)
+                x_check=x-7;
+            if(y+j-1>=100&&y+j-1<1000)
+                x_check=x-8;
+            if(x_check>=0&&(c[x_check]=='\n'||c[x_check]=='\0'))
+                continue;
+            
+            x++;
+            move(y,x);
+            getyx(b,y,x);
+            
+        }
+        else if(a==KEY_LEFT){
+            
+            getyx(b,y,x);
+            strcpy(c,"");
+            
+            
+            int m;
+            if(y+j<10)
+                m=0;
+            if(y+j>=10&&y+j-1<100)
+                m=1;
+            if(y+j>=100&&y+j-1<1000)
+                m=2;
+            
+            if(x==6+m){
+                continue;
+            }
+            
+            x--;
+            move(y,x);
+            getyx(b,y,x);
+        }
+        else if(a==KEY_F(1)){
+            getyx(b,y,x);
+            // clear();
+            // printw("We want go to VISIUL MODE");
+            // getch();
+            // endwin();
+            // getyx(b,y,x);
+            // pri
+            endwin();
+            VISUAL_mode(x,y,j,file_ful_name,0);
+        }
+        else if(a==KEY_F(2)){
+            NORMAL_mode(x,y,file_ful_name,change,j);
+        }
+        
+        else{
+            vas=1;
+            getyx(b,y,x);
+            
+            strcpy(c,"");
+            read_line(y+j-1,file_ful_name);
+            int x_check;
+            if(y+j-1<10)
+                x_check=x-6;
+            if(y+j-1>=10&&y+j-1<100)
+                x_check=x-7;
+            if(y+j-1>=100&&y+j-1<1000)
+                x_check=x-8;
+            if(x_check<0)
+                continue;
+
+            char A[5]="";
+            A[0]=(char)a;
+            // strcpy(A,"!");
+            int m=0;
+            int q=y+j-1;
+            while (1)
+            {
+                q=q/10;
+                if(q==0)
+                    break;
+                m++;
+            }
+            int k=x-(6+m);
+            
+                        
+            save_file_txt(file_ful_name);
+            // shape_insert(x,y,file_ful_name,1,j);
+            insert_txt(file_ful_name,k,y+j-1,A);
+            save_file_txt(file_ful_name);
+            // clear();
+            // mvprintw(0,0,"%s",c);
+            // getch();
+            refresh();
+            shape_insert(x,y,file_ful_name,1,j);
+            refresh();
+            change=1;
+            
+            if(a!='\n'){
+                x++;
+                move(y,x);
+            }
+            if(a=='\n'){
+            y++;
+            strcpy(c,"");
+            read_line(y+j-1,file_ful_name);
+            
+            if(y+j-1<10)
+                x=6;
+            if(y+j-1>=10&&y+j-1<100)
+                x=7;
+            if(y+j-1>=100&&y+j-1<1000)
+                x=8;
+            
+            move(y,x);
+            
+            }
+
+            // clear();
+            save_file_txt(file_ful_name);
+            // printw("AASSQQQ::::[%s]",c);
+            continue;
+        }   
+    }        
+    
+    noecho();
+    getch();
+    endwin();    
+    return;
+
 }
+
 
 void shape_insert(int x_pos,int y_pos,char file_ful_name[],int change,int j){
     
@@ -2096,6 +2445,43 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 
                 continue;
             }
             else{
+                
+                getyx(b,y,x);
+                if(y+j-2>0){
+                    char A[1000];
+                    char B[1000];
+                    int lB;
+                    int lA;
+                    strcpy(c,"");
+                    read_line(y+j-1,file_ful_name);
+                    strcpy(A,c);
+                    strcpy(c,"");
+                    read_line(y+j-2,file_ful_name);
+                    strcpy(B,c);
+                    strcpy(c,"");
+                    lB=(int)strlen(B);
+                    lA=(int)strlen(A);
+                    
+                    int m;
+                    if(y+j-2<10)
+                        m=0;
+                    if(y+j-2>=10&&y+j-2<100)
+                        m=1;
+                    if(y+j-2>=100&&y+j-2<1000)
+                        m=2;
+                
+                    if(lB<lA&&x>lB+m+5){
+                        
+                                            // clear();
+                    // printw("%d %d",(int)strlen(B),(int)strlen(A));
+                    // getch();
+
+
+                        x=lB-1+6+m;
+                    }
+
+                }//333//
+
                 y--;
                 move(y,x);
             }
@@ -2148,6 +2534,51 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 
                 continue;
             }
             else if(y!=max_y-4){
+                    int m1;
+                    if(y+j<10)
+                        m1=0;
+                    if(y+j>=10&&y+j<100)
+                        m1=1;
+                    if(y+j>=100&&y+j<1000)
+                        m1=2;
+                    
+                    if(y+j>0){
+                    
+                        char A[1000];
+                        char B[1000];
+                        int lB;
+                        int lA;
+                        strcpy(c,"");
+                        read_line(y+j-1,file_ful_name);
+                        strcpy(A,c);
+                        strcpy(c,"");
+                        read_line(y+j,file_ful_name);
+                        strcpy(B,c);
+                        strcpy(c,"");
+                        lB=(int)strlen(B);
+                        lA=(int)strlen(A);
+                        // clear();
+                        // printw("lA=%d lB=%d x=%d",lA,lB,x);
+                        // getch();
+                                            int m;
+                            if(y+j<10)
+                                m=0;
+                            if(y+j>=10&&y+j<100)
+                                m=1;
+                            if(y+j>=100&&y+j<1000)
+                                m=2;
+                        if(lB<lA&&x>lB+m+5){
+                            
+                                                // clear();
+                        // printw("%d %d",(int)strlen(B),(int)strlen(A));
+                        // getch();
+    
+
+                            x=lB-1+6+m;
+                        }
+
+                    }//333//
+                
                 y++;
                 move(y,x);
             }
@@ -2155,11 +2586,68 @@ void NORMAL_mode(int x_pos,int y_pos,char file_ful_name[],int change,int j){//0 
         }
 
         else if(a==KEY_RIGHT){
+            // x++;
+            // move(y,x);
+            // getyx(b,y,x);
+            getyx(b,y,x);
+            strcpy(c,"");
+            read_line(y+j-1,file_ful_name);
+            int x_check;
+            if(y+j-1<10)
+                x_check=x-6;
+            if(y+j-1>=10&&y+j-1<100)
+                x_check=x-7;
+            if(y+j-1>=100&&y+j-1<1000)
+                x_check=x-8;
+            if(x_check>=0&&(c[x_check]=='\n'||c[x_check]=='\0')){
+                x--;
+                move(y,x);
+                continue;
+            }
+            
             x++;
             move(y,x);
             getyx(b,y,x);
         }
         else if(a==KEY_LEFT){
+            // x--;
+            // move(y,x);
+            // getyx(b,y,x);
+
+            // getyx(b,y,x);
+            // strcpy(c,"");
+            // read_line(y+j-1,file_ful_name);
+            // int x_check;
+            // if(y+j-1<10)
+            //     x_check=x-6;
+            // if(y+j-1>=10&&y+j-1<100)
+            //     x_check=x-7;
+            // if(y+j-1>=100&&y+j-1<1000)
+            //     x_check=x-8;
+            // if(x_check>=0&&(c[x_check]=='\n'||c[x_check]=='\0')){
+            //     clear();
+            //     getch();
+            //     x++;
+            //     move(y,x);
+            //     continue;
+            // }
+
+            getyx(b,y,x);
+            strcpy(c,"");
+            
+            
+            int m;
+            if(y+j<10)
+                m=0;
+            if(y+j>=10&&y+j-1<100)
+                m=1;
+            if(y+j>=100&&y+j-1<1000)
+                m=2;
+            
+            if(x==6+m){
+                continue;
+            }
+
             x--;
             move(y,x);
             getyx(b,y,x);
